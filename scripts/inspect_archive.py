@@ -22,7 +22,7 @@ summary=Counter()
 titles=Counter()
 sample_missing_images=[]
 pages_missing_title=[]
-all_paths=list(ROOT.rglob("*"))
+all_paths=[p for p in ROOT.rglob("*") if ".git" not in p.relative_to(ROOT).parts and "reports" not in p.relative_to(ROOT).parts]
 summary["files_total"]=sum(p.is_file() for p in all_paths)
 summary["file_bytes"]=sum(p.stat().st_size for p in all_paths if p.is_file())
 for file in HTML:
