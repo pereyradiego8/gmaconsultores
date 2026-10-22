@@ -7,82 +7,21 @@
 <meta name="description" content="Propuesta de rediseño institucional para GMA Consultores: consultoría, impuestos, auditoría, outsourcing y recursos humanos.">
 <title>GMA Consultores | Vista previa del rediseño</title>
 <link rel="icon" href="../wp-content/uploads/2020/07/GMA.-Web.-Favicon.png">
-<style>
-:root{--red:#b80a13;--wine:#8b0911;--ink:#192432;--muted:#5d6876;--line:#e5e8ed;--paper:#f7f8fa}
-*{box-sizing:border-box}html{scroll-behavior:smooth}
-body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);line-height:1.55;background:white}
-a{color:inherit;text-decoration:none}a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--red);outline-offset:4px}
-img{display:block;max-width:100%}.container{width:min(1180px,calc(100% - 40px));margin-inline:auto}
-.skip{position:fixed;z-index:999;top:14px;left:14px;background:#fff;padding:12px 18px;transform:translateY(-160%);border:2px solid var(--red)}
-.skip:focus{transform:translateY(0)}
-header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(16px)}
-.head-inner{display:flex;align-items:center;gap:36px;justify-content:space-between;min-height:86px}
-.brand{display:inline-flex;align-items:center;min-width:160px}.brand img{width:135px;max-height:55px;object-fit:contain}
-.desktop-nav{display:flex;gap:30px;align-items:center;font-size:14px;font-weight:650}
-.desktop-nav a:hover,.contact-mini:hover{color:var(--red)}
-.top-cta{padding:13px 19px;background:var(--red);color:#fff!important;border-radius:8px;font-weight:700;font-size:14px}
-.top-cta:hover{background:var(--wine)}
-.mobile-nav{display:none;position:relative}.mobile-nav summary{font-weight:700;cursor:pointer;list-style:none;border:1px solid var(--line);padding:10px 15px;border-radius:8px}
-.mobile-nav[open] nav{position:absolute;right:0;top:calc(100% + 18px);width:min(300px,90vw);display:grid;gap:4px;background:#fff;box-shadow:0 22px 50px #111a2a22;border:1px solid var(--line);border-radius:12px;padding:12px}
-.mobile-nav nav a{padding:12px 10px;border-radius:7px}.mobile-nav nav a:hover{background:#f7f8fa}
-.hero{background:linear-gradient(118deg,#f6f7f9 0%,#fff 58%,#f9eeee 100%);position:relative;overflow:hidden}
-.hero-inner{display:grid;grid-template-columns:1.12fr .88fr;align-items:center;gap:54px;padding-block:clamp(65px,9vw,122px)}
-.eyebrow{display:inline-flex;gap:9px;align-items:center;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--red);margin:0 0 21px}
-.eyebrow:before{content:"";width:26px;height:2px;background:var(--red)}
-h1{font-size:clamp(2.6rem,5.1vw,4.5rem);line-height:1.065;letter-spacing:-.055em;margin:0 0 27px;font-weight:750;max-width:13ch}
-h1 span{color:var(--red)}.lead{color:var(--muted);font-size:clamp(1rem,1.5vw,1.15rem);max-width:56ch;margin:0 0 32px}
-.actions{display:flex;gap:14px;flex-wrap:wrap}.button{display:inline-flex;align-items:center;gap:12px;border-radius:9px;min-height:52px;padding:13px 22px;font-weight:750;font-size:14px}
-.button.primary{background:var(--red);color:#fff}.button.primary:hover{background:var(--wine)}
-.button.secondary{border:1px solid #c9ced8;background:#fff}.button.secondary:hover{border-color:var(--red);color:var(--red)}
-.visual{position:relative;min-height:470px;border-radius:20px;overflow:hidden;background:#263747;box-shadow:0 35px 60px #26374726}
-.visual img{width:100%;height:100%;position:absolute;inset:0;object-fit:cover}
-.visual:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,#111d2bc4 100%)}
-.visual-label{position:absolute;bottom:26px;left:28px;right:20px;z-index:2;color:white;font-size:clamp(1.25rem,2.5vw,1.8rem);font-weight:750;line-height:1.22;max-width:18ch}
-.section{padding-block:clamp(68px,8vw,112px)}
-.section-head{display:flex;align-items:end;justify-content:space-between;gap:26px;margin-bottom:40px}
-.kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--red);margin:0 0 12px}
-h2{font-size:clamp(2rem,3.7vw,3.15rem);line-height:1.12;letter-spacing:-.045em;margin:0;max-width:17ch}
-.section-intro{color:var(--muted);max-width:40ch;margin:0}
-.services{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
-.service{display:flex;flex-direction:column;align-items:flex-start;min-height:240px;padding:31px;background:#fff;border:1px solid var(--line);border-radius:14px;transition:box-shadow .2s,transform .2s,border-color .2s}
-.service:hover{transform:translateY(-3px);box-shadow:0 20px 40px #23324913;border-color:#d9b0b3}
-.service .num{font-size:12px;font-weight:800;color:var(--red);letter-spacing:.12em;margin-bottom:31px}
-.service h3{font-size:22px;line-height:1.2;letter-spacing:-.02em;margin:0 0 11px}
-.service p{font-size:14px;color:var(--muted);margin:0 0 24px}
-.service .more{margin-top:auto;font-size:13px;color:var(--red);font-weight:800}
-.band{background:#192633;color:white;padding-block:90px}
-.band-inner{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center}
-.band h2{color:white}.band p{color:#cfdae5}.band .kicker{color:#f4a0a3}
-.band .button{background:white;color:var(--ink)}.band .button:hover{background:#f4e8e9}
-.points{display:grid;gap:18px}.point{border-top:1px solid #ffffff30;padding-top:21px}
-.point strong{display:block;font-size:18px;margin-bottom:5px}.point span{display:block;color:#cfdae5;font-size:14px}
-.contact{background:var(--paper)}
-.contact-layout{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:start}
-.contact h2{margin-bottom:24px}.contact p{color:var(--muted)}
-.contact-panel{background:#fff;padding:36px;border:1px solid var(--line);border-radius:16px}
-.contact-panel dl{margin:0}.contact-panel dt{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);font-weight:800;margin-top:24px}
-.contact-panel dt:first-child{margin-top:0}.contact-panel dd{margin:7px 0 0;font-size:17px}
-.contact-panel a{text-decoration:underline;text-underline-offset:4px}
-footer{background:#101a24;color:#ccd5de;padding:35px 0}
-.foot{display:flex;justify-content:space-between;gap:20px;align-items:center;font-size:13px}.foot nav{display:flex;gap:24px}.foot a:hover{color:#fff}
-@media(max-width:950px){.desktop-nav{display:none}.mobile-nav{display:block}.hero-inner{gap:30px}.services{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:700px){.container{width:min(100% - 32px,1180px)}.hero-inner,.band-inner,.contact-layout{grid-template-columns:1fr;gap:38px}.hero-inner{padding-block:55px}.visual{min-height:300px}.section-head{display:block}.section-intro{margin-top:16px}.services{grid-template-columns:1fr}.service{min-height:200px}.section{padding-block:67px}.band{padding-block:65px}.foot{align-items:start;flex-direction:column}h1{max-width:15ch}}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.service{transition:none}.service:hover{transform:none}}
-</style>
+<link rel="stylesheet" href="../assets/gma-preview.css">
 </head>
 <body>
 <a class="skip" href="#contenido">Saltar al contenido</a>
 <header><div class="container head-inner">
-<a class="brand" href="../index.html" aria-label="GMA Consultores, volver al sitio original"><img width="135" height="55" src="../wp-content/uploads/2020/08/GMA.-Web.-Logo2.png" alt="GMA Consultores"></a>
-<nav class="desktop-nav" aria-label="Navegación principal"><a href="../quienes-somos/">Nosotros</a><a href="#servicios">Servicios</a><a href="../novedades/">Novedades</a><a href="../oportunidades/">Oportunidades</a><a href="../contacto/" class="top-cta">Contacto ↗</a></nav>
-<details class="mobile-nav"><summary>Menú</summary><nav aria-label="Navegación móvil"><a href="../quienes-somos/">Nosotros</a><a href="#servicios">Servicios</a><a href="../novedades/">Novedades</a><a href="../oportunidades/">Oportunidades</a><a href="../contacto/">Contacto</a></nav></details>
+<a class="brand" href="./" aria-label="GMA Consultores, volver al inicio de la propuesta"><img width="135" height="55" src="../wp-content/uploads/2020/08/GMA.-Web.-Logo2.png" alt="GMA Consultores"></a>
+<nav class="desktop-nav" aria-label="Navegación principal"><a href="nosotros/">Nosotros</a><a href="servicios/">Servicios</a><a href="novedades/">Novedades</a><a href="oportunidades/">Oportunidades</a><a href="contacto/" class="top-cta">Contacto ↗</a></nav>
+<details class="mobile-nav"><summary>Menú</summary><nav aria-label="Navegación móvil"><a href="nosotros/">Nosotros</a><a href="servicios/">Servicios</a><a href="novedades/">Novedades</a><a href="oportunidades/">Oportunidades</a><a href="contacto/">Contacto</a></nav></details>
 </div></header>
 <main id="contenido">
 <section class="hero" aria-labelledby="hero-title"><div class="container hero-inner">
 <div><p class="eyebrow">GMA Consultores · Argentina</p>
 <h1 id="hero-title">Soluciones profesionales para <span>tu empresa.</span></h1>
 <p class="lead">Consultoría, auditoría, impuestos, outsourcing y recursos humanos. Acompañamos a las organizaciones con asesoramiento especializado para sus desafíos de gestión.</p>
-<div class="actions"><a class="button primary" href="#servicios">Explorar servicios <span aria-hidden="true">↗</span></a><a class="button secondary" href="../contacto/">Contactar al equipo <span aria-hidden="true">→</span></a></div>
+<div class="actions"><a class="button primary" href="servicios/">Explorar servicios <span aria-hidden="true">↗</span></a><a class="button secondary" href="contacto/">Contactar al equipo <span aria-hidden="true">→</span></a></div>
 </div>
 <div class="visual"><img src="../wp-content/uploads/2020/09/GMA.-Slider.-Asesoramiento.jpg" alt="Imagen institucional de asesoramiento de GMA Consultores" width="840" height="560" fetchpriority="high">
 <div class="visual-label">Conocimiento especializado para necesidades reales.</div></div>
@@ -90,25 +29,25 @@ footer{background:#101a24;color:#ccd5de;padding:35px 0}
 <section class="section" id="servicios"><div class="container">
 <div class="section-head"><div><p class="kicker">Nuestras áreas</p><h2>Servicios que acompañan a cada organización.</h2></div><p class="section-intro">Conocé las especialidades y soluciones de GMA, desde el asesoramiento hasta la gestión de procesos.</p></div>
 <div class="services">
-<a class="service" href="../consultoria/"><span class="num">01 / ESTRATEGIA</span><h3>Consultoría</h3><p>Asesoramiento especializado para empresas y organizaciones.</p><span class="more">Conocer servicio ↗</span></a>
-<a class="service" href="../auditoria/"><span class="num">02 / CONTROL</span><h3>Auditoría</h3><p>Servicios profesionales de auditoría y revisión.</p><span class="more">Conocer servicio ↗</span></a>
-<a class="service" href="../impuestos/"><span class="num">03 / IMPUESTOS</span><h3>Asesoramiento impositivo</h3><p>Servicios y asistencia en materia impositiva.</p><span class="more">Conocer servicio ↗</span></a>
-<a class="service" href="../outsourcing/"><span class="num">04 / OPERACIONES</span><h3>Outsourcing</h3><p>Gestión contable, administrativa, impositiva y laboral.</p><span class="more">Conocer servicio ↗</span></a>
-<a class="service" href="../rrhh/"><span class="num">05 / PERSONAS</span><h3>Recursos humanos</h3><p>Soluciones en recursos humanos y outsourcing de personal.</p><span class="more">Conocer servicio ↗</span></a>
-<a class="service" href="../soluciones-de-back-office/"><span class="num">06 / SOPORTE</span><h3>Back-office</h3><p>Servicios de apoyo para operar y gestionar procesos en Argentina.</p><span class="more">Conocer servicio ↗</span></a>
+<a class="service" href="servicios/#consultoria"><span class="num">01 / ESTRATEGIA</span><h3>Consultoría</h3><p>Asesoramiento especializado para empresas y organizaciones.</p><span class="more">Conocer servicio ↗</span></a>
+<a class="service" href="servicios/#auditoria"><span class="num">02 / CONTROL</span><h3>Auditoría</h3><p>Servicios profesionales de auditoría y revisión.</p><span class="more">Conocer servicio ↗</span></a>
+<a class="service" href="servicios/#impuestos"><span class="num">03 / IMPUESTOS</span><h3>Asesoramiento impositivo</h3><p>Servicios y asistencia en materia impositiva.</p><span class="more">Conocer servicio ↗</span></a>
+<a class="service" href="servicios/#outsourcing"><span class="num">04 / OPERACIONES</span><h3>Outsourcing</h3><p>Gestión contable, administrativa, impositiva y laboral.</p><span class="more">Conocer servicio ↗</span></a>
+<a class="service" href="servicios/#rrhh"><span class="num">05 / PERSONAS</span><h3>Recursos humanos</h3><p>Soluciones en recursos humanos y outsourcing de personal.</p><span class="more">Conocer servicio ↗</span></a>
+<a class="service" href="servicios/#back-office"><span class="num">06 / SOPORTE</span><h3>Back-office</h3><p>Servicios de apoyo para operar y gestionar procesos en Argentina.</p><span class="more">Conocer servicio ↗</span></a>
 </div></div></section>
 <section class="band"><div class="container band-inner">
-<div><p class="kicker">Más que una web institucional</p><h2>Información y oportunidades en un solo lugar.</h2><p>Accedé a las publicaciones profesionales y a las búsquedas laborales existentes, preservadas desde el sitio original.</p><a class="button" href="../novedades/">Ver todas las novedades →</a></div>
+<div><p class="kicker">Más que una web institucional</p><h2>Información y oportunidades en un solo lugar.</h2><p>Accedé a las publicaciones profesionales y a las búsquedas laborales existentes, preservadas desde el sitio original.</p><a class="button" href="novedades/">Ver todas las novedades →</a></div>
 <div class="points"><div class="point"><strong>Novedades y publicaciones</strong><span>Acceso al archivo de información contable, impositiva y laboral de GMA.</span></div><div class="point"><strong>Oportunidades laborales</strong><span>Información sobre búsquedas y posibilidades de postulación.</span></div><div class="point"><strong>Búsqueda de contenidos</strong><span>Explorá el archivo publicado a través del buscador de la versión estática.</span></div><a class="button" href="../buscar/">Buscar contenidos →</a></div>
 </div></section>
 <section class="section contact" id="contacto"><div class="container contact-layout">
-<div><p class="kicker">Conversemos</p><h2>¿Necesitás asesoramiento profesional?</h2><p>Contactá al equipo de GMA por los canales oficiales publicados por la firma.</p><div class="actions"><a class="button primary" href="mailto:info@gmaconsultores.com.ar">Escribir un correo ↗</a><a class="button secondary" href="../contacto/">Ver página de contacto →</a></div></div>
+<div><p class="kicker">Conversemos</p><h2>¿Necesitás asesoramiento profesional?</h2><p>Contactá al equipo de GMA por los canales oficiales publicados por la firma.</p><div class="actions"><a class="button primary" href="mailto:info@gmaconsultores.com.ar">Escribir un correo ↗</a><a class="button secondary" href="contacto/">Ver página de contacto →</a></div></div>
 <div class="contact-panel"><dl>
 <dt>Correo</dt><dd><a href="mailto:info@gmaconsultores.com.ar">info@gmaconsultores.com.ar</a></dd>
 <dt>Teléfono</dt><dd><a href="tel:+541148118150">+54 11 4811-8150</a></dd>
 <dt>Oficina</dt><dd>Av. Callao 852, piso 8<br>Ciudad Autónoma de Buenos Aires</dd>
 </dl></div></div></section>
 </main>
-<footer><div class="container foot"><div>GMA Consultores · Propuesta visual de modernización</div><nav aria-label="Enlaces del pie"><a href="../index.html">Versión original</a><a href="../novedades/">Novedades</a><a href="../contacto/">Contacto</a></nav></div></footer>
+<footer><div class="container foot"><div>GMA Consultores · Propuesta visual de modernización</div><nav aria-label="Enlaces del pie"><a href="../index.html">Versión original</a><a href="novedades/">Novedades</a><a href="contacto/">Contacto</a></nav></div></footer>
 </body>
 </html>
