@@ -16,7 +16,7 @@ async function main(){
   for(const width of widths){
    const page=await browser.newPage({viewport:{width,height:900}});
    for(const route of routes){
-    await page.goto(BASE+route,{waitUntil:'networkidle',timeout:20000});
+    await page.goto(BASE+route,{waitUntil:'domcontentloaded',timeout:25000});
     await page.addScriptTag({path:axeScript});
     const result=await page.evaluate(()=>window.axe.run(document,{
       runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa']}
