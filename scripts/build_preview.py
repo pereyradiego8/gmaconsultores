@@ -24,7 +24,7 @@ ROOT=Path(__file__).resolve().parents[1]
 ORIGINAL="https://gmaconsultores.com.ar"
 PREVIEW_PAGES=("index.html","nosotros/index.html","servicios/index.html",
                "novedades/index.html","oportunidades/index.html","contacto/index.html")
-ASSETS=("assets/gma-preview.css","wp-content/uploads/2020/07/GMA.-Web.-Favicon.png",
+ASSETS=("assets/gma-preview.css","assets/gma-content.css","wp-content/uploads/2020/07/GMA.-Web.-Favicon.png",
        "wp-content/uploads/2020/08/GMA.-Web.-Logo2.png",
        "wp-content/uploads/2020/09/GMA.-Slider.-Asesoramiento.jpg")
 
