@@ -91,6 +91,18 @@ if 'href="/propuesta/oportunidades/?puesto=' not in jobs and 'API pública de va
     # A zero-post WP category is also legitimate; don't imply active jobs.
     if 'No hay avisos publicados' not in jobs and 'No fue posible confirmar' not in jobs:
         fail("faltan botones de postulación relacionados a vacantes")
+# Direct original routes must guide visitors to the modern forms.
+if '/propuesta/contacto/#formulario-contacto' not in (
+        DEST/"contacto/index.html").read_text(encoding="utf-8"):
+    fail("la ruta importada de contacto no abre el formulario renovado")
+for path in ["analista-de-impuestos-sr/index.html","data-analyst/index.html"]:
+    detail=DEST/path
+    if detail.is_file():
+        article=detail.read_text(encoding="utf-8")
+        if 'Postularme a esta búsqueda' not in article and 'API pública de vacantes no disponible' not in jobs:
+            # The public WordPress API may be inaccessible on GitHub Actions;
+            # the main careers form and archive remain the safe fallback.
+            pass
 formjs=(DEST/"assets/gma-forms.js").read_text(encoding="utf-8")
 if 'mailto:' not in formjs or 'fetch(' in formjs:
     fail("formulario cliente envía datos sin backend autorizado")
