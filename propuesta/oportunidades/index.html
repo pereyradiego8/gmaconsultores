@@ -7,6 +7,8 @@
 <title>Oportunidades laborales | Propuesta GMA Consultores</title>
 <link rel="icon" href="../../wp-content/uploads/2020/07/GMA.-Web.-Favicon.png">
 <link rel="stylesheet" href="../../assets/gma-preview.css">
+<link rel="stylesheet" href="../../assets/gma-forms.css">
+<script src="../../assets/gma-forms.js" defer></script>
 </head>
 <body>
 <a class="skip" href="#contenido">Saltar al contenido</a>
@@ -22,17 +24,42 @@
 <main id="contenido">
 <section class="subhero"><div class="container">
 <div class="breadcrumb"><a href="../">Inicio</a> / Oportunidades laborales</div><p class="eyebrow">Talento y carreras</p>
-<h1>Oportunidades laborales</h1><p class="lead">Consultá las oportunidades publicadas por GMA y verificá su vigencia en el sitio original.</p>
+<h1>Oportunidades laborales</h1><p class="lead">Explorá las búsquedas que GMA publica en su sitio oficial, leé los requisitos y prepará tu postulación.</p>
 </div></section>
 <section class="section"><div class="container two-columns">
 <div class="text-panel"><p class="kicker">Búsquedas y postulaciones</p><h2>Oportunidades publicadas por GMA.</h2>
-<p>El sitio original incluye avisos para perfiles contables, impositivos, de análisis de datos y otras especialidades. Las publicaciones se conservan con sus referencias y mecanismos de postulación.</p>
-<div class="archive-note"><p>La disponibilidad de cada búsqueda no fue verificada en tiempo real. Consultá la fecha y la vigencia del aviso antes de enviar una postulación.</p></div>
+<p>Consultamos la categoría oficial «Búsqueda» de GMA y mostramos sus avisos con la fecha original de publicación. Podés leer el detalle y postularte al correo indicado por GMA.</p>
+<div class="archive-note"><p>GMA publica estos avisos en su sección «Búsquedas activas». Algunos tienen fechas de 2024 y 2025: confirmá con Recursos Humanos que la vacante siga abierta.</p></div>
 <div class="actions actions-spaced"><a class="button primary" href="../../oportunidades/">Consultar oportunidades originales →</a><a class="button secondary" href="../contacto/">Canales de contacto ↗</a></div>
 </div><aside class="aside"><h3>Áreas relacionadas</h3>
 <a href="../../rrhh/">Recursos humanos <span>→</span></a>
 <a href="../../base-de-talentos/">Base de talentos <span>→</span></a>
 <a href="../../oportunidades/">Listado de publicaciones <span>→</span></a>
+</aside></div></section>
+<section class="section gma-form-wrap" id="postulacion"><div class="container gma-cta-columns">
+<div class="gma-form-panel">
+<p class="kicker">Recursos humanos</p>
+<h2>Formulario de postulación</h2>
+<p>Prepará tu candidatura. Al abrir tu aplicación de correo, adjuntá el CV y completá cualquier dato adicional solicitado en el aviso antes de enviarlo.</p>
+<form id="gma-application-form" class="gma-form" method="post" action="mailto:rrhh@gmaconsultores.com.ar" enctype="text/plain">
+<div class="gma-field"><label for="job-puesto">Puesto de interés *</label><select id="job-puesto" name="puesto" required><option value="">Seleccioná una oportunidad</option><!--GMA_JOB_OPTIONS--></select></div>
+<div class="gma-form-row">
+<div class="gma-field"><label for="job-nombre">Nombre y apellido *</label><input id="job-nombre" name="nombre" autocomplete="name" maxlength="130" required></div>
+<div class="gma-field"><label for="job-email">Email *</label><input id="job-email" type="email" name="email" autocomplete="email" maxlength="180" required></div>
+</div>
+<div class="gma-field"><label for="job-telefono">Teléfono</label><input id="job-telefono" name="telefono" type="tel" autocomplete="tel" maxlength="80"></div>
+<div class="gma-field"><label for="job-mensaje">Breve presentación *</label><textarea id="job-mensaje" name="mensaje" minlength="10" maxlength="1200" rows="4" placeholder="Contanos por qué te interesa el puesto" required></textarea></div>
+<p class="gma-form-note">La candidatura no se envía desde esta página. Vas a tener que confirmar el envío en tu correo y adjuntar el CV manualmente. No almacenamos información personal en Cloudflare.</p>
+<button class="button primary" type="submit">Preparar postulación por correo ↗</button>
+<p class="gma-form-feedback" role="status" aria-live="polite"></p>
+</form>
+</div><aside class="aside">
+<h3>Cómo postularte</h3>
+<p>1. Revisá la descripción y la fecha de publicación del aviso.</p>
+<p>2. Elegí el puesto y completá la presentación.</p>
+<p>3. Adjuntá tu CV en tu aplicación de correo y presioná Enviar.</p>
+<a href="mailto:rrhh@gmaconsultores.com.ar">rrhh@gmaconsultores.com.ar <span>↗</span></a>
+<a href="https://gmaconsultores.com.ar/oportunidades/">Consultar búsquedas oficiales <span>↗</span></a>
 </aside></div></section>
 </main>
 <footer><div class="container foot"><div>GMA Consultores · Vista previa de modernización</div>
