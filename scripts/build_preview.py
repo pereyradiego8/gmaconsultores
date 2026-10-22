@@ -68,7 +68,7 @@ def recent_public_news():
             title=" ".join(title.split())[:170]
             url=item.get("link","")
             date=item.get("date","")[:10]
-            if not title or not url.startswith(ORIGINAL+"/") or not re.fullmatch(r"\\d{4}-\\d{2}-\\d{2}",date):
+            if not title or not url.startswith(ORIGINAL+"/") or not re.fullmatch(r"\d{4}-\d{2}-\d{2}",date):
                 continue
             valid.append((title,url,date))
         print("Noticias públicas validadas:",len(valid))
