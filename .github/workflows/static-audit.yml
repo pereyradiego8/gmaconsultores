@@ -1,0 +1,15 @@
+name: Verificación estática GMA
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validar páginas, navegación y sitemap
+        run: python3 scripts/audit_static.py
