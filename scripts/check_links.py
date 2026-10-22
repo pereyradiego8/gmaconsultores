@@ -57,6 +57,8 @@ def main():
  outfile.write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
  print(json.dumps(stats,ensure_ascii=False))
  print("Ejemplos reportados:",len(bad))
+ print("Primeras referencias faltantes:",json.dumps(bad[:18],ensure_ascii=False))
+ print("Páginas con más referencias faltantes:",json.dumps(missing_by_file.most_common(12),ensure_ascii=False))
  print("Reporte:",outfile.relative_to(ROOT))
  if args.strict and sum(n for k,n in counts.items() if k.endswith("_missing")):raise SystemExit(1)
 if __name__=="__main__":main()
