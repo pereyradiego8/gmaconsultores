@@ -10,7 +10,11 @@ import re
 import sys
 import xml.etree.ElementTree as ET
 
-ROOT=pathlib.Path(__file__).resolve().parents[1]
+import argparse
+parser=argparse.ArgumentParser(description="Validar fuentes o build estático")
+parser.add_argument("--root",default=".",help="Raíz del sitio, por ejemplo dist")
+args=parser.parse_args()
+ROOT=(pathlib.Path(__file__).resolve().parents[1]/args.root).resolve()
 CRITICAL=[
  "index.html","quienes-somos/index.html","consultoria/index.html",
  "outsourcing/index.html","impuestos/index.html","auditoria/index.html",
