@@ -89,7 +89,24 @@ async function run() {
   const pageTarget=await browserPage.locator('#results li a').first().evaluate(a=>a.href);
   const detail=await browserPage.goto(pageTarget,{waitUntil:'domcontentloaded'});
   if(detail?.status()!==200)failures.push('Imported search destination not available: '+pageTarget);
-  const headers=(await browserPage.goto(BASE+'/propuesta/',{waitUntil:'domcontentloaded'}))?.headers()||{};
+  for(const [route,selector,recipient] of [
+    ['/propuesta/contacto/','#gma-contact-form','info@gmaconsultores.com.ar'],
+    ['/propuesta/oportunidades/','#gma-application-form','rrhh@gmaconsultores.com.ar'],
+    ['/propuesta/novedades/','#gma-newsletter-form','info@gmaconsultores.com.ar'],
+  ]) {
+    await browserPage.goto(BASE+route,{waitUntil:'domcontentloaded'});
+    const info=await browserPage.locator(selector).evaluate(form=>({
+      action:form.getAttribute('action'),
+      email:!!form.querySelector('input[type="email"][required]'),
+      submit:!!form.querySelector('button[type="submit"]'),
+      loaded:[...document.scripts].some(x=>x.src.includes('gma-forms.js')),
+      options:form.querySelector('select[name="puesto"]')?.options.length ?? null
+    }));
+    if(info.action!=='mailto:'+recipient)failures.push(route+' missing real mail recipient');
+    if(!info.email||!info.submit||!info.loaded)failures.push(route+' missing functional form controls');
+    if(route.includes('oportunidades')&&info.options<2)failures.push(route+' missing selectable job positions');
+  }
+    const headers=(await browserPage.goto(BASE+'/propuesta/',{waitUntil:'domcontentloaded'}))?.headers()||{};
   if(!headers['content-security-policy'] && process.env.PREVIEW_URL?.startsWith('https://'))failures.push('Missing CSP response header');
   await browserPage.close();
  }finally{await browser.close()}
