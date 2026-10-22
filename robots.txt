@@ -1,5 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: http://gmaconsultores.com.ar/sitemap.xml
-Sitemap: http://gmaconsultores.com.ar/wzy.php?sitemap.xml
-Sitemap: http://gmaconsultores.com.ar/wpadmin/wpadmin.php?sitemap.xml
+Sitemap: https://gmaconsultores.com.ar/sitemap.xml
