@@ -33,7 +33,7 @@ Sitio institucional para empresas y organizaciones en Argentina. Se preservan ru
 - `index.html`, `quienes-somos/index.html`, `consultoria/index.html`, `outsourcing/index.html`, `impuestos/index.html`, `auditoria/index.html`, `rrhh/index.html`, `oportunidades/index.html`, `novedades/index.html`, `contacto/index.html`: integración del CSS y metadatos, navegación accesible y buscador compatible con el espejo estático.
 - `assets/gma-search-index.json`: rutas reales existentes, excluyendo feeds y paginaciones. La búsqueda compara slugs/títulos derivados de rutas; **no indexa el cuerpo completo** de cada nota.
 - `buscar/index.html`: búsqueda sin servidor, sin dependencias externas, con mensajes de error y sin resultados.
-- `sitemap.xml` y `robots.txt`: sitemap del espejo basado en rutas presentes y limpieza de referencias sospechosas.
+- `sitemap.xml` y `robots.txt`: sitemap del espejo basado en rutas presentes (sin páginas noindex) y limpieza de referencias sospechosas.
 - `propuesta/index.html`: propuesta visual más profunda y **no indexable** para evaluar antes de sustituir la portada, sin formularios simulados.
 - `scripts/audit_static.py` y `scripts/inspect_archive.py`: chequeos y reporte automatizado. `.github/workflows/static-audit.yml`: pipeline en PR y rama principal.
 
@@ -50,7 +50,7 @@ Sitio institucional para empresas y organizaciones en Argentina. Se preservan ru
 
 ## 5. Resultado inicial de GitHub Actions (ejecución #39803666566)
 
-El workflow completó correctamente su primera ejecución; se generó un artefacto JSON de auditoría estática. La comprobación estructural informó **1.132 archivos HTML en la rama, 356 rutas del índice de búsqueda y 356 URLs de sitemap**. El análisis global contó **2.361 etiquetas de formulario, incluidas 802 etiquetas de formularios Elementor; 12.167 etiquetas `img`, con 24 sin atributo `alt`; 357 HTML sin H1; 1.120 HTML sin metadescripción; 432 sin canonical, y 351 sin `lang` o `viewport`**. Los totales incluyen archivos de feeds y duplicados exportados, no son una evaluación manual de cada ruta. Las etiquetas y las páginas HTML no equivalen necesariamente a funcionalidades únicas.
+El workflow completó correctamente su primera ejecución; se generó un artefacto JSON de auditoría estática. La comprobación estructural informó **1.132 archivos HTML en la rama, 356 rutas del índice de búsqueda y 356 URLs de sitemap (355 después de excluir la página de búsqueda marcada noindex)**. El análisis global contó **2.361 etiquetas de formulario, incluidas 802 etiquetas de formularios Elementor; 12.167 etiquetas `img`, con 24 sin atributo `alt`; 357 HTML sin H1; 1.120 HTML sin metadescripción; 432 sin canonical, y 351 sin `lang` o `viewport`**. Los totales incluyen archivos de feeds y duplicados exportados, no son una evaluación manual de cada ruta. Las etiquetas y las páginas HTML no equivalen necesariamente a funcionalidades únicas.
 
 El primer informe incluyó el directorio local `.git` en el peso total calculado: se ajustó el script para excluirlo. El workflow también fue actualizado a la versión de acciones compatible con Node.js 24. Ambos ajustes requieren comprobar la siguiente ejecución.
 
