@@ -9,9 +9,12 @@ implemented here: use Cloudflare Access if private access is required.
 from __future__ import annotations
 
 import argparse
+import html
 import json
 import re
 import shutil
+import urllib.request
+from datetime import datetime
 from pathlib import Path
 from build_static import title_from, description_from, plain
 
@@ -43,6 +46,50 @@ def render_search(src:str)->str:
     src=src.replace("link.href='..'+item.url", "link.href='https://gmaconsultores.com.ar'+item.url")
     return src
 
+def recent_public_news():
+    """Read public WordPress posts at build time, without scraping private data.
+
+    The original news archive remains linked if WordPress is unavailable.
+    Content is escaped rather than injected as HTML from another origin.
+    """
+    uri=ORIGINAL+"/wp-json/wp/v2/posts?per_page=6&_fields=date,link,title"
+    try:
+        request=urllib.request.Request(uri,headers={
+            "User-Agent":"GMA-Preview-Build/1.0 (+https://gmaconsultores-preview.pages.dev)",
+            "Accept":"application/json"})
+        with urllib.request.urlopen(request,timeout=7) as response:
+            if response.status!=200:
+                raise ValueError("WordPress returned HTTP "+str(response.status))
+            entries=json.loads(response.read(100000).decode("utf-8"))
+        valid=[]
+        for item in entries[:6]:
+            title=html.unescape(re.sub(r"<[^>]+>"," ",item.get("title",{}).get("rendered","")))
+            title=" ".join(title.split())[:170]
+            url=item.get("link","")
+            date=item.get("date","")[:10]
+            if not title or not url.startswith(ORIGINAL+"/") or not re.fullmatch(r"\\d{4}-\\d{2}-\\d{2}",date):
+                continue
+            valid.append((title,url,date))
+        return valid
+    except (OSError,ValueError,KeyError,TypeError,UnicodeError) as exc:
+        print("Aviso: no se pudo consultar noticias públicas de WordPress:",type(exc).__name__)
+        return []
+
+def news_section(items):
+    if not items:
+        return ""
+    cards=[]
+    for title,url,date in items:
+        cards.append('<article class="simple-item"><p class="kicker">Publicación · '+
+                     html.escape(date)+'</p><h3>'+html.escape(title)+'</h3>'+
+                     '<a class="button secondary" href="'+html.escape(url,quote=True)+
+                     '">Leer en la web oficial ↗</a></article>')
+    return '<section class="section"><div class="container">'+\
+           '<div class="section-head"><div><p class="kicker">Actualizaciones del sitio original</p>'+\
+           '<h2>Publicaciones recientes</h2></div>'+\
+           '<p class="section-intro">Obtenidas de la API pública de GMA durante la última compilación; verificá vigencia y fechas en la fuente.</p></div>'+\
+           '<div class="simple-list">'+"".join(cards)+'</div></div></section>'
+
 def main():
     p=argparse.ArgumentParser()
     p.add_argument("--output",default="preview-dist")
@@ -66,6 +113,10 @@ def main():
         target=dest/"propuesta"/page
         target.parent.mkdir(parents=True,exist_ok=True)
         page_src=internal_to_live(page,infile.read_text(encoding="utf-8"))
+        if page=="novedades/index.html":
+            extra=news_section(recent_public_news())
+            if extra:
+                page_src=page_src.replace("</main>",extra+"</main>")
         target.write_text(page_src,encoding="utf-8")
     search=ROOT/"buscar/index.html"
     target=dest/"buscar/index.html"
