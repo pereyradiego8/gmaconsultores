@@ -18,7 +18,7 @@ CRITICAL=[
  "contacto/index.html"]
 failures=[]
 warnings=[]
-paths=list(ROOT.rglob("*.html"))
+paths=[p for p in ROOT.rglob("*.html") if not any(x in {".git","dist","reports"} for x in p.relative_to(ROOT).parts)]
 for path in CRITICAL:
  f=ROOT/path
  if not f.is_file():
