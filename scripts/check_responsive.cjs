@@ -29,7 +29,7 @@ async function run() {
   for(const width of widths){
    const page=await browser.newPage({viewport:{width,height:900},deviceScaleFactor:1});
    for(const route of routes){
-    const response=await page.goto(BASE+route,{waitUntil:'networkidle',timeout:20000});
+    const response=await page.goto(BASE+route,{waitUntil:'domcontentloaded',timeout:25000});
     const result=await page.evaluate(()=>{
       const width=window.innerWidth;
       const html=document.documentElement;
