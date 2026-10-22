@@ -53,7 +53,7 @@ async function run() {
         .map(el=>el.textContent.trim().slice(0,50));
       const stylesLoaded=routeFromBody()!=="/buscar/"?
         [...document.styleSheets].some(s=>s.href&&s.href.includes("gma-preview.css")):
-        !!document.querySelector("style");
+        [...document.styleSheets].some(s=>s.href&&s.href.includes("gma-search.css"));
       function routeFromBody(){return location.pathname}
       return {
         viewport:width,htmlWidth:html.scrollWidth,bodyWidth:body.scrollWidth,
@@ -76,6 +76,17 @@ async function run() {
    }
    await page.close();
   }
+  // Verify actual navigation, search results and 404 behavior, not only layout.
+  const browserPage=await browser.newPage({viewport:{width:390,height:844}});
+  const missing=await browserPage.goto(BASE+'/missing-audit-link-73777/',{waitUntil:'domcontentloaded'});
+  if(missing?.status()!==404)failures.push('Unknown URL should return HTTP 404');
+  await browserPage.goto(BASE+'/buscar/?s=impuestos',{waitUntil:'networkidle'});
+  await browserPage.waitForSelector('#results li a',{timeout:12000});
+  const href=await browserPage.locator('#results li a').first().getAttribute('href');
+  if(!href?.startsWith('https://gmaconsultores.com.ar/'))failures.push('Search result points outside original: '+href);
+  const headers=(await browserPage.goto(BASE+'/propuesta/',{waitUntil:'domcontentloaded'}))?.headers()||{};
+  if(!headers['content-security-policy'] && process.env.PREVIEW_URL?.startsWith('https://'))failures.push('Missing CSP response header');
+  await browserPage.close();
  }finally{await browser.close()}
  fs.writeFileSync(path.join(folder,'resultados.json'),JSON.stringify({pages:summary.length,widths,routes,failures,summary},null,2));
  console.log(JSON.stringify({tested:summary.length,widths,failures,preview:BASE},null,2));
