@@ -27,6 +27,7 @@ A_TAG = re.compile(r"<a\b[^>]*href=[\"']([^\"']+)[\"'][^>]*>", re.I | re.S)
 BODY_TEXT = re.compile(r"<div\b[^>]*class=[\"'][^\"']*\bpost-content\b[^\"']*[\"'][^>]*>", re.I)
 CONTROL = {"script", "style", "noscript", "iframe", "form", "input", "select",
            "option", "textarea", "button", "svg", "canvas", "video", "audio"}
+CONTROL_VOID = {"input", "br", "hr", "img", "source", "track", "embed"}
 ALLOWED = {"h2", "h3", "h4", "p", "strong", "b", "em", "i", "u", "ul", "ol", "li",
            "blockquote", "figure", "figcaption", "table", "thead", "tbody",
            "tfoot", "tr", "td", "th", "br", "hr", "code", "pre", "a", "img",
@@ -100,11 +101,11 @@ class ContentSanitizer(HTMLParser):
 
     def handle_starttag(self, tag: str, attributes: list[tuple[str, str | None]]) -> None:
         if self.skip:
-            if tag not in EMPTY:
+            if tag not in CONTROL_VOID:
                 self.skip += 1
             return
         if tag in CONTROL:
-            if tag not in EMPTY:
+            if tag not in CONTROL_VOID:
                 self.skip = 1
             return
         if tag not in ALLOWED:
@@ -135,7 +136,8 @@ class ContentSanitizer(HTMLParser):
 
     def handle_endtag(self, tag: str) -> None:
         if self.skip:
-            self.skip -= 1
+            if tag not in CONTROL_VOID:
+                self.skip -= 1
             return
         if tag not in ALLOWED or tag in EMPTY:
             return
