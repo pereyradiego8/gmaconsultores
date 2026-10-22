@@ -31,7 +31,7 @@ def internal_to_live(page:str, markup:str)->str:
     else:
         markup=markup.replace('href="../../buscar/"', 'href="/buscar/"')
         markup=markup.replace('href="../../index.html"',f'href="{ORIGINAL}/"')
-        markup=re.sub(r'href="../../(?!wp-content|assets)([^"#?]+)"'
+        markup=re.sub(r'href="../../(?!wp-content|assets)([^"#?]+)"',
                       lambda m:'href="'+ORIGINAL+'/'+m.group(1)+'"',markup)
         # Original site's contact page is an external link, not the new preview.
     return markup
@@ -83,7 +83,7 @@ def main():
     markup=markup.replace(script.group(0),'<script src="../assets/gma-search.js" defer></script>')
     markup=markup.replace('style="color:#b80a13"','class="brand-accent"')
     markup=markup.replace('style="position:absolute;clip:rect(0,0,0,0)"','class="visually-hidden"')
-    if re.search(r"\\sstyle=|<style>|<script>(?!\\s*<)",markup,re.I):
+    if re.search(r"\sstyle=|<style>|<script>(?!\s*<)",markup,re.I):
         raise RuntimeError("Inline style/script remains in generated search")
     target.write_text(markup,encoding="utf-8")
     index=json.loads((ROOT/"assets/gma-search-index.json").read_text(encoding="utf-8"))
