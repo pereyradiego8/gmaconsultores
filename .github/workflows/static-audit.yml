@@ -15,8 +15,18 @@ jobs:
         run: python3 scripts/audit_static.py
       - name: Inspeccionar todos los HTML y recursos
         run: python3 scripts/inspect_archive.py --output reports/gma-static-audit.json
-      - name: Adjuntar informe de auditoría
+      - name: Generar versión de prueba sin desplegar
+        run: python3 scripts/build_static.py --output dist
+      - name: Validar la versión generada
+        run: python3 scripts/audit_static.py --root dist
+      - name: Auditar enlaces locales del build
+        run: python3 scripts/check_links.py --root dist --output reports/gma-links.json
+      - name: Adjuntar informes y el índice del buscador
         uses: actions/upload-artifact@v6
         with:
           name: auditoria-estatica-gma
-          path: reports/gma-static-audit.json
+          path: |
+            reports/gma-static-audit.json
+            reports/gma-build.json
+            reports/gma-links.json
+            dist/assets/gma-search-index.json
