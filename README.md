@@ -35,3 +35,16 @@ El directorio `dist/` es generado, no se commitea, y no se publica automáticame
 Los formularios de Elementor dependen de WordPress. No enviar consultas mediante endpoints inexistentes ni simular éxitos de envío.
 
 Consultar [auditoría inicial](docs/AUDITORIA-2026-10-22.md) y [reporte de continuación](docs/AVANCES-MODERNIZACION.md).
+
+
+## Integración del sitio original
+
+La versión de Cloudflare Pages ahora importa contenido WordPress al diseño moderno: **427 páginas de contenido y listados (347 páginas individuales y 80 archivos)** más **707 imágenes y recursos públicos**, según la compilación inicial. Los duplicados del mirror y los feeds no se despliegan como páginas independientes.
+
+Los servicios detallados, artículos, búsquedas laborales históricas y páginas de archivo están dentro del preview con las mismas rutas de las páginas canónicas. El buscador dirige a esas páginas y la sección moderna de oportunidades muestra enlaces al archivo de vacantes; las noticias recientes se obtienen de la API pública de WordPress durante cada compilación.
+
+Los formularios Elementor, suscripciones y postulaciones siguen ejecutándose **solo en el sitio WordPress original**; el frontend estático no puede reproducir los envíos sin su backend. La nueva versión enlaza a sus formularios originales en vez de simular una operación exitosa.
+
+Construcción: `python3 scripts/build_preview.py --output preview-dist`; validación: `python3 scripts/verify_integrated.py`. Informe: [Integración completa de contenidos](docs/INTEGRACION-CONTENIDO-ORIGINAL.md).
+
+**No se fusionó `main`, no se cambió el DNS y no se sustituyó la producción original.**
