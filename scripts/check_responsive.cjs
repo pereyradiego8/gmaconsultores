@@ -46,7 +46,8 @@ async function run() {
         right:Math.round(el.getBoundingClientRect().right),
         left:Math.round(el.getBoundingClientRect().left),
       }));
-      const imgFailures=[...document.images].filter(img=>!img.complete||img.naturalWidth===0)
+      const imgFailures=[...document.images].filter(img=>
+        img.complete && img.naturalWidth===0 && img.getAttribute('src'))
         .map(img=>img.getAttribute('src'));
       const interactive=[...document.querySelectorAll('.button,.mobile-nav summary')].filter(el=>
         getComputedStyle(el).display!=='none'&&el.getBoundingClientRect().height>0);
