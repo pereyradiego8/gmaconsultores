@@ -20,6 +20,7 @@ def main():
  parser=argparse.ArgumentParser()
  parser.add_argument("--root",default=".")
  parser.add_argument("--output",default="reports/gma-links.json")
+ parser.add_argument("--focus",default="",help="Comprobar solo páginas bajo una subcarpeta, por ejemplo propuesta/")
  parser.add_argument("--strict",action="store_true",help="Fail when any local resource is missing (not recommended on imported WordPress archives)")
  args=parser.parse_args()
  root=(ROOT/args.root).resolve()
@@ -29,6 +30,7 @@ def main():
  checked=0
  for page in root.rglob("*.html"):
   if any(part in {".git","reports","dist","node_modules"} for part in page.relative_to(root).parts):continue
+  if args.focus and not page.relative_to(root).as_posix().startswith(args.focus):continue
   html=page.read_text(encoding="utf-8",errors="replace")
   if not re.search(r"<html\b",html,re.I):continue
   checked+=1
