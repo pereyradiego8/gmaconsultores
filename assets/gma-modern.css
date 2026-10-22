@@ -1,0 +1,70 @@
+/* GMA 2026 · Progressive enhancements for static Avada export
+   Tokens conserve the existing red identity. Avoid changing plugin internals. */
+:root {
+  --gma-brand: #b80a13;
+  --gma-brand-deep: #8c0710;
+  --gma-ink: #1c2735;
+  --gma-muted: #526070;
+  --gma-surface: #ffffff;
+  --gma-canvas: #f8fafc;
+  --gma-outline: #dfe5ec;
+  --gma-radius: 14px;
+}
+html { scroll-behavior: smooth; }
+body.fusion-body { color: var(--gma-ink); -webkit-font-smoothing: antialiased; }
+body.fusion-body :is(p, li) { line-height: 1.65; }
+body.fusion-body :is(h1,h2,h3,h4) { text-wrap: balance; }
+body.fusion-body .fusion-header-wrapper { box-shadow: 0 5px 24px rgb(22 35 49 / 9%); }
+body.fusion-body .fusion-header { background: #fff; }
+body.fusion-body .fusion-main-menu > ul > li > a { font-weight: 600; letter-spacing: .01em; }
+body.fusion-body .fusion-main-menu > ul > li > a:hover { color: var(--gma-brand); }
+body.fusion-body :is(a, button, input, select, textarea, .fusion-button):focus-visible {
+  outline: 3px solid var(--gma-brand) !important;
+  outline-offset: 3px;
+}
+body.fusion-body .post-content :is(p,li) { color: var(--gma-ink); }
+body.fusion-body .post-content a:not(.fusion-button):not(.elementor-button):not(.fusion-rollover-link):hover { text-decoration: underline; text-underline-offset: .16em; }
+body.fusion-body :is(.fusion-button, a.fusion-button, .elementor-button, button.elementor-button) {
+  border-radius: 9px !important;
+  min-height: 44px;
+  transition: background-color .16s ease, border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+body.fusion-body :is(.fusion-button, .elementor-button):hover { box-shadow: 0 8px 18px rgb(93 24 29 / 15%); transform: translateY(-1px); }
+body.fusion-body .elementor-field-group :is(input:not([type="checkbox"]),select,textarea),
+body.fusion-body input[type="search"] {
+  border-radius: 9px !important;
+  border: 1px solid var(--gma-outline);
+  min-height: 44px;
+  max-width: 100%;
+}
+body.fusion-body :is(.fusion-imageframe img, .fusion-posts-container img) { max-width: 100%; height: auto; }
+body.fusion-body .fusion-footer-copyright-area { background-color: #182431; color: #f7f9fc; }
+body.fusion-body .fusion-footer-copyright-area a { color: #fff; }
+body.fusion-body .fusion-footer-copyright-area a:hover { color: #ffe3e5; }
+body.fusion-body .fusion-page-title-bar { background-color: var(--gma-canvas); }
+body.fusion-body .fusion-posts-container article { border-radius: var(--gma-radius); }
+.gma-skip-link { position: fixed; z-index: 999999; top: 10px; left: 12px;
+  padding: 12px 18px; color: #fff !important; background: var(--gma-brand);
+  border-radius: 9px; transform: translateY(-170%); text-decoration: none; }
+.gma-skip-link:focus { transform: translateY(0); }
+.gma-visually-hidden { position:absolute!important; height:1px!important; width:1px!important;
+  padding:0!important; margin:-1px!important; overflow:hidden!important;
+  clip:rect(0,0,0,0)!important; white-space:nowrap!important; border:0!important; }
+@media (max-width: 900px) {
+  body.fusion-body .fusion-header-wrapper { box-shadow: 0 3px 12px rgb(22 35 49 / 9%); }
+  body.fusion-body .post-content { overflow-wrap: anywhere; }
+  body.fusion-body .fusion-mobile-nav-holder a { min-height: 44px; }
+  body.fusion-body .fusion-fullwidth { background-size: cover; }
+  body.fusion-body .fusion-row { max-width: 100%; }
+}
+@media (max-width: 600px) {
+  body.fusion-body :is(h1,h2) { overflow-wrap: normal; }
+  body.fusion-body .elementor-widget-container { max-width: 100%; }
+  body.fusion-body .fusion-button { white-space: normal; }
+  body.fusion-body .fusion-header .fusion-row { padding-inline: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  *, *::before, *::after { animation-duration: .01ms !important;
+    transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
