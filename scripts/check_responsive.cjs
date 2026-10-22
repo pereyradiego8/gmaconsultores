@@ -14,8 +14,9 @@ const CHROME=process.env.CHROME_BIN||[
 ].find(fs.existsSync);
 const widths=[320,360,390,768,1024,1440];
 const routes=['/propuesta/','/propuesta/servicios/','/propuesta/nosotros/',
-  '/propuesta/novedades/','/propuesta/oportunidades/',
-  '/propuesta/contacto/','/buscar/'];
+  '/propuesta/novedades/','/propuesta/oportunidades/','/propuesta/contacto/',
+  '/buscar/','/consultoria/','/impuestos/','/rrhh/',
+  '/novedades/','/oportunidades/','/category/newsletter/'];
 async function run() {
  if(!CHROME)throw new Error('Chrome/Chromium no instalado');
  const browser=await chromium.launch({
@@ -83,7 +84,10 @@ async function run() {
   await browserPage.goto(BASE+'/buscar/?s=impuestos',{waitUntil:'networkidle'});
   await browserPage.waitForSelector('#results li a',{timeout:12000});
   const href=await browserPage.locator('#results li a').first().getAttribute('href');
-  if(!href?.startsWith('https://gmaconsultores.com.ar/'))failures.push('Search result points outside original: '+href);
+  if(!href?.startsWith('..'))failures.push('Search result should open modern imported page: '+href);
+  const pageTarget=await browserPage.locator('#results li a').first().evaluate(a=>a.href);
+  const detail=await browserPage.goto(pageTarget,{waitUntil:'domcontentloaded'});
+  if(detail?.status()!==200)failures.push('Imported search destination not available: '+pageTarget);
   const headers=(await browserPage.goto(BASE+'/propuesta/',{waitUntil:'domcontentloaded'}))?.headers()||{};
   if(!headers['content-security-policy'] && process.env.PREVIEW_URL?.startsWith('https://'))failures.push('Missing CSP response header');
   await browserPage.close();
