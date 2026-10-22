@@ -106,11 +106,17 @@ def main()->None:
     output.mkdir()
     stats={"copied_files":0,"transformed_html":0,"css_added":0,"descriptions_added":0,"search_forms_repaired":0,"alias_noindex":0}
     for file in ROOT.rglob("*"):
-        if not file.is_file() or any(part in OMIT or part==args.output for part in file.relative_to(ROOT).parts):
+        if not file.is_file():
+            continue
+        relative=file.relative_to(ROOT)
+        # Exclude repository tooling at the root ONLY. WordPress stores required
+        # CSS/JS inside wp-includes/{css,js}/dist: do not drop those assets.
+        if relative.parts[0] in OMIT or relative.parts[0]==args.output:
+            continue
+        if any(part in {".git","node_modules","__pycache__",".venv"} for part in relative.parts[1:]):
             continue
         if file.name in {"README.md",".gitignore"}:
             continue
-        relative=file.relative_to(ROOT)
         target=output/relative
         target.parent.mkdir(parents=True,exist_ok=True)
         if file.suffix.lower()==".html":
