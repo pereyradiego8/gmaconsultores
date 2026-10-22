@@ -154,7 +154,7 @@ main:focus{outline:none}
   .brand img{width:112px;max-height:42px}
   .hero-inner{grid-template-columns:1fr;gap:23px;padding-block:32px 36px}
   h1{max-width:19ch;margin-bottom:11px;font-size:clamp(2.05rem,7.5vw,3rem)}
-  .lead{margin-bottom:17px}
+  .lead{margin-bottom:14px}
   .visual{min-height:0;aspect-ratio:16/9;max-height:320px}
   .visual-label{right:16px;bottom:15px;left:18px;font-size:clamp(1.1rem,3.8vw,1.4rem)}
   .section-head{display:block;margin-bottom:18px}
@@ -179,8 +179,8 @@ main:focus{outline:none}
   h1{font-size:clamp(1.95rem,9vw,2.6rem)}
   h2{font-size:clamp(1.6rem,7vw,2rem)}
   .subhero h1{font-size:clamp(1.9rem,8.6vw,2.5rem)}
-  .hero-inner{gap:19px;padding-block:27px 30px}
-  .visual{aspect-ratio:1.5}
+  .hero-inner{gap:16px;padding-block:23px 25px}
+  .visual{aspect-ratio:1.65}
   .services{grid-template-columns:1fr;gap:10px}
   .service{padding:17px 18px}
   .service .num{margin-bottom:7px}
@@ -198,7 +198,7 @@ main:focus{outline:none}
 @media(max-width:360px){
   .actions>.button{width:100%}
   .points>.button{width:100%}
-  .visual{aspect-ratio:1.35}
+  .visual{aspect-ratio:1.55}
   .mobile-nav[open] nav{max-width:calc(100vw - 24px)}
 }
 @media(hover:none){
