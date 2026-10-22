@@ -37,6 +37,52 @@ footer{padding:26px 0;border-top:1px solid var(--line);color:var(--muted)}
 .pages button:disabled{opacity:.45;cursor:not-allowed}
 .pages span{color:var(--muted);font-size:.88rem}
 @media(max-width:600px){.search{flex-direction:column}button{width:100%}nav a{margin-left:7px}}
+
+/* Compact, fluid search UI for the Cloudflare preview */
+:root{color-scheme:light}
+html{-webkit-text-size-adjust:100%}
+body{min-width:280px;overflow-wrap:break-word}
+.wrap{width:min(1040px,calc(100% - 36px))}
+header .wrap{min-height:64px}
+main{padding:clamp(26px,4.5vw,53px) 0}
+h1{font-size:clamp(1.9rem,4.5vw,2.85rem);line-height:1.13;letter-spacing:-.035em;margin:0 0 10px;text-wrap:balance}
+.intro{font-size:1rem;line-height:1.55;margin:0 0 16px}
+.search{gap:10px;margin:16px 0}
+input[type=search]{min-height:46px;padding:10px 14px;font-size:16px}
+button{min-height:46px;padding:9px 17px}
+.tools{gap:10px;margin-bottom:16px}
+.tools label{flex-wrap:wrap;gap:8px}
+.tools select{min-height:44px;max-width:100%;font-size:14px}
+.result-count{margin:0}
+.results{gap:12px;grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr))}
+.results li{padding:17px;min-width:0}
+.results p{margin:9px 0 0;line-height:1.5}
+.kind{margin-bottom:5px}
+.pages{flex-wrap:wrap;gap:10px;margin:19px 0 0}
+.pages button{min-height:44px}
+footer{padding:17px 0}
+a{overflow-wrap:anywhere}
+@media(max-width:620px){
+ .wrap{width:calc(100% - 32px)}
+ header .wrap{min-height:59px}
+ header nav{display:flex;flex-wrap:wrap;gap:6px 12px}
+ nav a{margin:0;font-size:14px}
+ main{padding:26px 0 32px}
+ .search{flex-direction:column}
+ .search button{width:100%}
+ .tools{align-items:flex-start;flex-direction:column}
+ .tools label{width:100%;justify-content:space-between}
+ .tools select{flex:0 1 auto;min-width:150px}
+ .results{grid-template-columns:1fr;gap:10px}
+ .results li{padding:15px}
+}
+@media(max-width:360px){
+ .wrap{width:calc(100% - 28px)}
+ .tools label{align-items:flex-start;flex-direction:column}
+ .tools select{width:100%}
+ nav a{font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:0s!important}}
 </style>
 </head>
 <body>
