@@ -57,6 +57,12 @@ if no_target:fail("índice apunta a rutas ausentes: "+", ".join(no_target[:10]))
 search=(DEST/"assets/gma-search.js").read_text(encoding="utf-8")
 if "link.href='..'+item.url" not in search:fail("el buscador no enlaza a las páginas importadas")
 if "https://gmaconsultores.com.ar'+item.url" in search:fail("el buscador todavía redirige contenido importado")
+first=(DEST/"category/newsletter/index.html").read_text(encoding="utf-8")
+second=(DEST/"category/newsletter/page/2/index.html").read_text(encoding="utf-8")
+if 'href="/category/newsletter/page/2/"' not in first:
+    fail("la paginación newsletter no apunta a la página 2 local")
+if 'href="/category/newsletter/"' not in second:
+    fail("la página 2 de newsletter no tiene acceso a la primera página local")
 for file in ["404.html","_headers","robots.txt","assets/gma-content.css"]:
     if not (DEST/file).exists():fail("falta recurso de producción: "+file)
 print(json.dumps({
