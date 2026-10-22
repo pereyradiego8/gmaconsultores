@@ -76,6 +76,11 @@ a{overflow-wrap:anywhere}
  .results{grid-template-columns:1fr;gap:10px}
  .results li{padding:15px}
 }
+@media(max-width:400px){
+ header .wrap{align-items:flex-start;justify-content:center;flex-direction:column;gap:1px;padding-block:8px}
+ header nav{gap:14px}
+ .brand{font-size:1.14rem}
+}
 @media(max-width:360px){
  .wrap{width:calc(100% - 28px)}
  .tools label{align-items:flex-start;flex-direction:column}
