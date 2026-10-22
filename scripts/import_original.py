@@ -64,6 +64,10 @@ def safe_target(raw: str, current: str, local_routes: set[str], assets: set[str]
         return None
     if url.netloc.lower() in ("gmaconsultores.com.ar", "www.gmaconsultores.com.ar"):
         path = unquote(url.path)
+        # wget/WordPress exports link to /index.html; Cloudflare Pages uses
+        # the canonical folder URL /, including archive pagination.
+        if path.endswith("/index.html") and path[:-10] in local_routes:
+            path = path[:-10]
         if path.startswith("/wp-content/uploads/") and path.lstrip("/") in assets:
             return url.path + (("?" + url.query) if url.query else "")
         if path in local_routes and not url.query:
