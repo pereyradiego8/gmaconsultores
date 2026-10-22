@@ -6,7 +6,7 @@ const {chromium}=require('playwright-core');
 const axeScript=require.resolve('axe-core/axe.min.js');
 const BASE=process.env.PREVIEW_URL||'http://127.0.0.1:8765';
 const CHROME=process.env.CHROME_BIN||['/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/usr/bin/chromium','/usr/bin/chromium-browser'].find(fs.existsSync);
-const routes=['/propuesta/','/propuesta/servicios/','/propuesta/nosotros/','/propuesta/novedades/','/propuesta/oportunidades/','/propuesta/contacto/','/buscar/'];
+const routes=['/propuesta/','/propuesta/servicios/','/propuesta/nosotros/','/propuesta/novedades/','/propuesta/oportunidades/','/propuesta/contacto/','/buscar/','/consultoria/','/impuestos/','/novedades/','/oportunidades/','/category/newsletter/'];
 const widths=[390,1440];
 async function main(){
  if(!CHROME)throw Error('Chromium not found');
