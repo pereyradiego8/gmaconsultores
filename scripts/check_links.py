@@ -14,7 +14,7 @@ import json
 import re
 
 ROOT=Path(__file__).resolve().parents[1]
-ATTR=re.compile(r'\b(href|src|action)=([\'"])(.*?)\2',re.I|re.S)
+ATTR=re.compile(r'(?<![\w-])(href|src|action)=([\'"])(.*?)\2',re.I|re.S)
 SKIP={"mailto","tel","javascript","data","blob","sms","whatsapp","intent","ftp"}
 def main():
  parser=argparse.ArgumentParser()
