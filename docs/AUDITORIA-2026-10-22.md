@@ -48,7 +48,13 @@ Sitio institucional para empresas y organizaciones en Argentina. Se preservan ru
 | Sin chequeo automatizado propio en el espejo | Scripts de auditoría y workflow CI en PR |
 | Sin página de propuesta visual | `/propuesta/` ofrece un rediseño autónomo sin afectar portada ni backend |
 
-## 5. Pruebas y limitaciones
+## 5. Resultado inicial de GitHub Actions (ejecución #39803666566)
+
+El workflow completó correctamente su primera ejecución; se generó un artefacto JSON de auditoría estática. La comprobación estructural informó **1.132 archivos HTML en la rama, 356 rutas del índice de búsqueda y 356 URLs de sitemap**. El análisis global contó **2.361 etiquetas de formulario, incluidas 802 etiquetas de formularios Elementor; 12.167 etiquetas `img`, con 24 sin atributo `alt`; 357 HTML sin H1; 1.120 HTML sin metadescripción; 432 sin canonical, y 351 sin `lang` o `viewport`**. Los totales incluyen archivos de feeds y duplicados exportados, no son una evaluación manual de cada ruta. Las etiquetas y las páginas HTML no equivalen necesariamente a funcionalidades únicas.
+
+El primer informe incluyó el directorio local `.git` en el peso total calculado: se ajustó el script para excluirlo. El workflow también fue actualizado a la versión de acciones compatible con Node.js 24. Ambos ajustes requieren comprobar la siguiente ejecución.
+
+## 6. Pruebas y limitaciones
 
 **No afirmar 90+ de Lighthouse ni LCP/INP/CLS sin medirlos.** Esta revisión no dispone de un navegador automatizado ejecutando el espejo ni acceso al WordPress/backend de producción. Los tests CI validan estructura, enlaces de búsqueda y archivos mínimos; la inspección integral adicional genera un JSON de inventario y alertas. Deben verificarse manualmente 320/375/768/1024/1440 px, accesibilidad con teclado y lector de pantalla, SEO live, tiempo de carga, formularios de contacto, newsletter, ofertas laborales e integraciones reales.
 
@@ -60,7 +66,7 @@ python3 -m http.server 8000
 ```
 Luego abrir `http://localhost:8000/`, `/buscar/` y `/propuesta/` (no usar `file://`, porque `fetch` del buscador requiere HTTP).
 
-## 6. Despliegue seguro y reversión
+## 7. Despliegue seguro y reversión
 
 1. Revisar primero este pull request y su pipeline; **no fusionar sin revisión**.
 2. Publicar preview en hosting estático aislado, apuntando al directorio raíz del repositorio, evitando el dominio activo.
@@ -69,7 +75,7 @@ Luego abrir `http://localhost:8000/`, `/buscar/` y `/propuesta/` (no usar `file:
 5. Decidir estrategia final: mantener WordPress y trasladar cambios al tema hijo/bloques, o migrar con backend de formularios, administración de contenidos, redirecciones 301 e integraciones verificadas.
 6. Mantener backup/commit de referencia y permitir rollback del despliegue previo.
 
-## 7. Próximas prioridades
+## 8. Próximas prioridades
 
 1. **P0:** auditoría del WordPress en vivo y de los sitemaps PHP no reconocidos.
 2. **P0:** probar contacto, newsletter y datos/capacidad de postulación con backend real.
