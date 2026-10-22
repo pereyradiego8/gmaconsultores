@@ -17,6 +17,7 @@ import urllib.request
 from datetime import datetime
 from pathlib import Path
 from build_static import title_from, description_from, plain
+from import_original import import_archive
 
 ROOT=Path(__file__).resolve().parents[1]
 ORIGINAL="https://gmaconsultores.com.ar"
@@ -34,8 +35,18 @@ def internal_to_live(page:str, markup:str)->str:
     else:
         markup=markup.replace('href="../../buscar/"', 'href="/buscar/"')
         markup=markup.replace('href="../../index.html"',f'href="{ORIGINAL}/"')
-        markup=re.sub(r'href="../../(?!wp-content|assets)([^"#?]+)"',
-                      lambda m:'href="'+ORIGINAL+'/'+m.group(1)+'"',markup)
+        def migrated_link(m):
+            url="/"+m.group(1)
+            # Publication detail and static archive pages now exist in the preview.
+            if url in {
+                "/consultoria/","/auditoria/","/impuestos/","/outsourcing/",
+                "/rrhh/","/soluciones-de-back-office/","/quienes-somos/",
+                "/novedades/","/oportunidades/","/base-de-talentos/",
+                "/category/novedades-especiales/","/category/novedades-contables/",
+                "/category/newsletter/"}:
+                return 'href="'+url+'"'
+            return 'href="'+ORIGINAL+url+'"'
+        markup=re.sub(r'href="../../(?!wp-content|assets)([^"#?]+)"',migrated_link,markup)
         # Original site's contact page is an external link, not the new preview.
     return markup
 
@@ -43,7 +54,7 @@ def render_search(src:str)->str:
     src=src.replace('href="../index.html"', 'href="../propuesta/"')
     src=src.replace('href="../novedades/"','href="../propuesta/novedades/"')
     src=src.replace('href="../contacto/"','href="../propuesta/contacto/"')
-    src=src.replace("link.href='..'+item.url", "link.href='https://gmaconsultores.com.ar'+item.url")
+    # Search results now open the imported pages on the renewed site.
     return src
 
 def recent_public_news():
@@ -102,6 +113,9 @@ def main():
     if dest.exists():
         shutil.rmtree(dest)
     dest.mkdir()
+    imported=import_archive(dest)
+    if imported["pages"]<300 or imported["assets"]<700:
+        raise RuntimeError("Incomplete public archive import; aborting deploy")
     for asset in ASSETS:
         infile=ROOT/asset
         if not infile.is_file():
@@ -145,7 +159,7 @@ def main():
         url=item["url"]
         if url=="/buscar/" or not url.endswith("/"):continue
         src=ROOT/url.lstrip("/")/"index.html"
-        if not src.is_file():continue
+        if not src.is_file() or not (dest/url.lstrip("/")/"index.html").is_file():continue
         markup=src.read_text(encoding="utf-8",errors="replace")
         title=title_from(markup,item["title"])
         desc=description_from(markup,title)
@@ -186,7 +200,8 @@ def main():
 <a class="button primary" href="/propuesta/">Volver al inicio</a></div></main></body></html>''',encoding="utf-8")
     (dest/"robots.txt").write_text("User-agent: *\nDisallow: /\n",encoding="utf-8")
     (dest/"_redirects").write_text("/ /propuesta/ 302\n",encoding="utf-8")
-    print(json.dumps({"preview_pages":len(PREVIEW_PAGES),"searchable_original_pages":len(records),
+    print(json.dumps({"preview_pages":len(PREVIEW_PAGES),"imported_original_pages":imported["pages"],
+                      "imported_assets":imported["assets"],"searchable_original_pages":len(records),
                       "file_count":sum(1 for f in dest.rglob("*") if f.is_file()),
                       "bytes":sum(f.stat().st_size for f in dest.rglob("*") if f.is_file())}))
     print("Local preview only: no Cloudflare Access or deploy performed.")
