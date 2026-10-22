@@ -10,13 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Verificar rutas institucionales e índices
         run: python3 scripts/audit_static.py
       - name: Inspeccionar todos los HTML y recursos
         run: python3 scripts/inspect_archive.py --output reports/gma-static-audit.json
       - name: Adjuntar informe de auditoría
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: auditoria-estatica-gma
           path: reports/gma-static-audit.json
