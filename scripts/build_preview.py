@@ -62,6 +62,7 @@ def recent_public_news():
                 raise ValueError("WordPress returned HTTP "+str(response.status))
             entries=json.loads(response.read(100000).decode("utf-8"))
         valid=[]
+        print("Noticias públicas recibidas de WordPress:",len(entries) if isinstance(entries,list) else "formato inválido")
         for item in entries[:6]:
             title=html.unescape(re.sub(r"<[^>]+>"," ",item.get("title",{}).get("rendered","")))
             title=" ".join(title.split())[:170]
@@ -70,6 +71,7 @@ def recent_public_news():
             if not title or not url.startswith(ORIGINAL+"/") or not re.fullmatch(r"\\d{4}-\\d{2}-\\d{2}",date):
                 continue
             valid.append((title,url,date))
+        print("Noticias públicas validadas:",len(valid))
         return valid
     except (OSError,ValueError,KeyError,TypeError,UnicodeError) as exc:
         print("Aviso: no se pudo consultar noticias públicas de WordPress:",type(exc).__name__)
