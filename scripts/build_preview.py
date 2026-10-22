@@ -227,6 +227,26 @@ def main():
         shutil.copy2(infile,target)
     jobs,fetched=get_public_jobs()
     jobs_markup,job_options=careers_section(jobs,fetched,dest)
+    # Add applications on the imported detail pages themselves, not only the
+    # aggregate careers page. Use exactly the source's job titles/links.
+    from urllib.parse import quote
+    for item in jobs:
+        local_path=urlsplit(item["url"]).path
+        detail_file=dest/local_path.lstrip("/")/"index.html"
+        if not detail_file.is_file():
+            continue
+        article=detail_file.read_text(encoding="utf-8")
+        action='/propuesta/oportunidades/?puesto='+quote(item["title"],safe='')+'#postulacion'
+        button='<p class="archive-apply"><a class="button primary" href="'+html.escape(action,quote=True)+'">Postularme a esta búsqueda ↗</a></p>'
+        article=article.replace('<div class="archive-actions">',button+'<div class="archive-actions">',1)
+        detail_file.write_text(article,encoding="utf-8")
+    # Users accessing original /contacto/ from search should find the new
+    # contact form instead of a generic stripped WordPress form.
+    imported_contact=dest/"contacto/index.html"
+    if imported_contact.is_file():
+        text=imported_contact.read_text(encoding="utf-8")
+        text=text.replace('<div class="archive-actions">','<p><a class="button primary" href="/propuesta/contacto/#formulario-contacto">Completar formulario de contacto →</a></p><div class="archive-actions">',1)
+        imported_contact.write_text(text,encoding="utf-8")
     for page in PREVIEW_PAGES:
         infile=ROOT/"propuesta"/page
         if not infile.is_file(): raise RuntimeError("Missing preview page: "+page)
