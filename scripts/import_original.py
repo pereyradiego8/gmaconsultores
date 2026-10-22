@@ -210,9 +210,9 @@ def listing_from_articles(markup: str, route: str, valid: set[str], assets: set[
 def chrome(title: str, route: str, description: str, content: str,
            form_notice: bool) -> str:
     esc = html.escape
-    label = esc(title[:170])
-    root_title = (title or "Contenido").split(" – GMA")[0].split(" | GMA")[0]
-    root_title = esc(root_title[:150])
+    clean_title = re.sub(r"\s*[|–-]\s*GMA(?:\s+Consultores)?\s*$","",title or "Contenido",flags=re.I).strip()
+    label = esc(clean_title[:170])
+    root_title = esc(clean_title[:150])
     notice = (
         '<aside class="archive-note"><p>Las consultas, postulaciones y suscripciones '
         'se procesan en el sitio oficial. Para enviar datos o completar un formulario '
