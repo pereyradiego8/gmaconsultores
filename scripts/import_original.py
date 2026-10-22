@@ -172,6 +172,27 @@ class ContentSanitizer(HTMLParser):
         return "".join(self.parts)
 
 
+def name_image_only_links(content: str) -> str:
+    """Supply discernible names for old linked logos with empty alt text."""
+    def fix(match: re.Match[str]) -> str:
+        opening, interior = match.group(1), match.group(2)
+        if clean_text(interior):
+            return match.group(0)
+        alt = re.search(r'<img\b[^>]*\balt=["\']([^"\']+)', interior, re.I)
+        if alt and html.unescape(alt.group(1)).strip():
+            return match.group(0)
+        href = get_attr(opening, "href")
+        parsed = urlsplit(href)
+        short = parsed.netloc.replace("www.", "") or parsed.path.strip("/").split("/")[-1]
+        short = re.sub(r"[^a-zA-Z0-9áéíóúñÁÉÍÓÚÑ ._-]", " ", short).strip()[:62]
+        label = "Abrir enlace relacionado" + (": " + short if short else "")
+        if "aria-label=" in opening:
+            return match.group(0)
+        return opening[:-1] + ' aria-label="' + html.escape(label, quote=True) + '">' + interior + "</a>"
+    return re.sub(r'(<a\b[^>]*href=["\'][^"\']+["\'][^>]*>)(.*?)</a>', fix,
+                  content, flags=re.I | re.S)
+
+
 def listing_from_articles(markup: str, route: str, valid: set[str], assets: set[str]) -> str:
     cards = []
     seen = set()
@@ -322,7 +343,7 @@ def import_archive(dest: Path) -> dict:
             if post_content:
                 sanitizer = ContentSanitizer(route, valid, assets)
                 sanitizer.feed(post_content)
-                body = sanitizer.result()
+                body = name_image_only_links(sanitizer.result())
             else:
                 body = ""
         plain = clean_text(body)
