@@ -16,7 +16,7 @@ jobs:
       - name: Inspeccionar todos los HTML y recursos
         run: python3 scripts/inspect_archive.py --output reports/gma-static-audit.json
       - name: Adjuntar informe de auditoría
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: auditoria-estatica-gma
           path: reports/gma-static-audit.json
