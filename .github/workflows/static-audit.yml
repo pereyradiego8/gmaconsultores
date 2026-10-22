@@ -25,6 +25,16 @@ jobs:
         run: python3 scripts/check_links.py --root dist --output reports/gma-links.json
       - name: Exigir que la propuesta no tenga recursos locales rotos
         run: python3 scripts/check_links.py --root dist --focus propuesta/ --strict --output reports/gma-preview-links.json
+      - name: Construir vista previa aislada sin desplegar
+        run: python3 scripts/build_preview.py --output preview-dist
+      - name: Validar recursos y navegación del preview Cloudflare
+        run: python3 scripts/check_links.py --root preview-dist --focus propuesta/ --strict --output reports/gma-cloudflare-preview-links.json
+      - name: Validar metadatos antiindexación
+        run: |
+          grep -q "Disallow: /" preview-dist/robots.txt
+          grep -q "X-Robots-Tag: noindex" preview-dist/_headers
+          test -f preview-dist/propuesta/contacto/index.html
+          test -f preview-dist/buscar/index.html
       - name: Adjuntar informes y el índice del buscador
         uses: actions/upload-artifact@v6
         with:
@@ -34,4 +44,5 @@ jobs:
             reports/gma-build.json
             reports/gma-links.json
             reports/gma-preview-links.json
+            reports/gma-cloudflare-preview-links.json
             dist/assets/gma-search-index.json
