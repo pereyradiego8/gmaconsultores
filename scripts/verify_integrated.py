@@ -43,8 +43,9 @@ for f in original_pages:
     if "gma-content" not in content:
         invalid.append(f.relative_to(DEST).as_posix()+" [sin contenido integrado]")
     for src in re.findall(r'<img\b[^>]*\bsrc="([^"]+)"',content,re.I):
-        path=urlsplit(src).path
-        if path.startswith("/") and not (DEST/unquote(path).lstrip("/")).is_file():
+        parsed=urlsplit(src)
+        path=parsed.path
+        if not parsed.netloc and path.startswith("/") and not (DEST/unquote(path).lstrip("/")).is_file():
             missing_images.add(path)
 if invalid:fail("formularios/scripts originales activos o páginas incompletas: "+", ".join(invalid[:8]))
 if missing_images:fail("faltan archivos de imagen referenciados: "+", ".join(sorted(missing_images)[:8]))
