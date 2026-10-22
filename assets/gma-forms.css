@@ -1,0 +1,28 @@
+/* Forms and live-listed jobs for modern GMA preview */
+.gma-form{display:grid;gap:15px;max-width:730px}
+.gma-field{display:grid;gap:6px;min-width:0}
+.gma-field label,.gma-field>span{font-size:14px;line-height:1.4;font-weight:720}
+.gma-field input,.gma-field select,.gma-field textarea{width:100%;max-width:100%;min-width:0;min-height:46px;line-height:1.45;font:inherit;color:var(--ink);padding:10px 13px;border:1px solid #bac6d0;border-radius:9px;background:#fff}
+.gma-field textarea{resize:vertical;min-height:112px}
+.gma-field input:focus-visible,.gma-field select:focus-visible,.gma-field textarea:focus-visible{outline:3px solid #b80a134d;border-color:var(--red);outline-offset:0}
+.gma-form-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.gma-form-note{margin:0;color:var(--muted);font-size:13px;line-height:1.56}
+.gma-form-feedback{min-height:0;font-size:14px;font-weight:600;color:#195f45}
+.gma-form [type="submit"]{justify-self:start;cursor:pointer}
+.gma-form-help{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.gma-form-help a{color:var(--red);text-decoration:underline;text-underline-offset:3px}
+.gma-form-panel{padding:clamp(19px,3.5vw,34px);border:1px solid var(--line);border-radius:14px;background:#fff}
+.gma-form-panel h2{margin:0 0 8px;font-size:clamp(1.5rem,3vw,2.2rem);max-width:35ch}
+.gma-form-panel>p{margin:0 0 18px;color:var(--muted)}
+.gma-jobs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.gma-job{display:flex;flex-direction:column;align-items:flex-start;min-width:0;border:1px solid var(--line);border-radius:12px;background:#fff;padding:21px;gap:9px}
+.gma-job h3{margin:0;font-size:19px;line-height:1.3;overflow-wrap:anywhere}
+.gma-job p{margin:0;color:var(--muted);line-height:1.55;font-size:14px}
+.gma-job .actions{margin-top:auto;padding-top:10px}
+.gma-job .button{font-size:13px;min-height:44px}
+.gma-job .kicker{margin:0}
+.gma-check-date{font-size:13px;color:var(--muted)}
+.gma-cta-columns{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(220px,.65fr);gap:24px;align-items:start}
+.gma-form-wrap{background:var(--paper)}
+@media(max-width:780px){.gma-jobs{grid-template-columns:1fr}.gma-cta-columns{grid-template-columns:1fr}}
+@media(max-width:540px){.gma-form-row{grid-template-columns:1fr;gap:15px}.gma-job{padding:17px}.gma-form [type="submit"]{width:100%}.gma-form-panel{padding:19px}.gma-job .actions{width:100%}.gma-job .actions .button{flex:1 1 auto}}
