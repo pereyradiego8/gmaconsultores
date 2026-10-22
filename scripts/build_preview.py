@@ -27,9 +27,11 @@ def internal_to_live(page:str, markup:str)->str:
     """Retarget original-site hyperlinks only; keep proposal navigation local."""
     if page=="index.html":
         markup=markup.replace('href="../index.html"',f'href="{ORIGINAL}/"')
-        markup=markup.replace('href="../buscar/"','href="../../buscar/"')
+        markup=markup.replace('href="../buscar/"','href="/buscar/"')
     else:
-        markup=re.sub(r'href="../../(?!wp-content|assets)([^"#?]+)"',
+        markup=markup.replace('href="../../buscar/"', 'href="/buscar/"')
+        markup=markup.replace('href="../../index.html"',f'href="{ORIGINAL}/"')
+        markup=re.sub(r'href="../../(?!wp-content|assets)([^"#?]+)"'
                       lambda m:'href="'+ORIGINAL+'/'+m.group(1)+'"',markup)
         # Original site's contact page is an external link, not the new preview.
     return markup
@@ -38,8 +40,7 @@ def render_search(src:str)->str:
     src=src.replace('href="../index.html"', 'href="../propuesta/"')
     src=src.replace('href="../novedades/"','href="../propuesta/novedades/"')
     src=src.replace('href="../contacto/"','href="../propuesta/contacto/"')
-    src=src.replace("a.href='..'+item.url", "a.href='https://gmaconsultores.com.ar'+item.url")
-    src=src.replace('rel="icon"','rel="icon"')
+    src=src.replace("link.href='..'+item.url", "link.href='https://gmaconsultores.com.ar'+item.url")
     return src
 
 def main():
@@ -69,7 +70,22 @@ def main():
     search=ROOT/"buscar/index.html"
     target=dest/"buscar/index.html"
     target.parent.mkdir(exist_ok=True)
-    target.write_text(render_search(search.read_text(encoding="utf-8")),encoding="utf-8")
+    markup=render_search(search.read_text(encoding="utf-8"))
+    # Externalize inline CSS/JS for a strict, no-unsafe-inline CSP.
+    style=re.search(r"<style>(.*?)</style>",markup,re.S)
+    script=re.search(r"<script>(.*?)</script>",markup,re.S)
+    if not style or not script:
+        raise RuntimeError("Missing expected search CSS/JS: update build when templates change")
+    stylesheet=style.group(1)+"\n.brand-accent{color:#b80a13}\n.visually-hidden{position:absolute;clip:rect(0 0 0 0);clip-path:inset(50%);width:1px;height:1px;overflow:hidden;white-space:nowrap}\n"
+    (dest/"assets/gma-search.css").write_text(stylesheet,encoding="utf-8")
+    (dest/"assets/gma-search.js").write_text(script.group(1),encoding="utf-8")
+    markup=markup.replace(style.group(0),'<link rel="stylesheet" href="../assets/gma-search.css">')
+    markup=markup.replace(script.group(0),'<script src="../assets/gma-search.js" defer></script>')
+    markup=markup.replace('style="color:#b80a13"','class="brand-accent"')
+    markup=markup.replace('style="position:absolute;clip:rect(0,0,0,0)"','class="visually-hidden"')
+    if re.search(r"\\sstyle=|<style>|<script>(?!\\s*<)",markup,re.I):
+        raise RuntimeError("Inline style/script remains in generated search")
+    target.write_text(markup,encoding="utf-8")
     index=json.loads((ROOT/"assets/gma-search-index.json").read_text(encoding="utf-8"))
     records=[]
     for item in index:
@@ -98,7 +114,17 @@ def main():
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: DENY
+  Strict-Transport-Security: max-age=31536000
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Content-Security-Policy: default-src 'none'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'
 ''',encoding="utf-8")
+    (dest/"404.html").write_text('''<!doctype html><html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Página no encontrada | GMA Consultores</title>
+<link rel="stylesheet" href="/assets/gma-preview.css"></head>
+<body><main class="section"><div class="container"><p class="kicker">Error 404</p>
+<h1>Página no encontrada</h1><p>El enlace que buscás no existe en esta vista previa.</p>
+<a class="button primary" href="/propuesta/">Volver al inicio</a></div></main></body></html>''',encoding="utf-8")
     (dest/"robots.txt").write_text("User-agent: *\nDisallow: /\n",encoding="utf-8")
     (dest/"_redirects").write_text("/ /propuesta/ 302\n",encoding="utf-8")
     print(json.dumps({"preview_pages":len(PREVIEW_PAGES),"searchable_original_pages":len(records),
