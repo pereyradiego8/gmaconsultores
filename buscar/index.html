@@ -28,6 +28,14 @@ button:hover{background:#8c0710}
 .results a:hover{text-decoration:underline;text-decoration-color:var(--red);text-underline-offset:4px}
 .kind{font-size:.73rem;text-transform:uppercase;letter-spacing:.08em;color:var(--red);font-weight:800;margin-bottom:8px}
 footer{padding:26px 0;border-top:1px solid var(--line);color:var(--muted)}
+.tools{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin:0 0 25px}
+.tools label{display:flex;align-items:center;gap:9px;font-size:.9rem;font-weight:700}
+.tools select{border-radius:9px;min-height:43px;border:1px solid #bdcbd8;padding:6px 10px;background:#fff;color:var(--dark);font:inherit}
+.results p{font-size:.9rem;color:var(--muted);margin:12px 0 0;line-height:1.55}
+.pages{display:flex;justify-content:center;align-items:center;gap:14px;margin:32px 0 0}
+.pages button{min-height:42px;padding:9px 17px;font-size:.88rem}
+.pages button:disabled{opacity:.45;cursor:not-allowed}
+.pages span{color:var(--muted);font-size:.88rem}
 @media(max-width:600px){.search{flex-direction:column}button{width:100%}nav a{margin-left:7px}}
 </style>
 </head>
@@ -41,29 +49,91 @@ footer{padding:26px 0;border-top:1px solid var(--line);color:var(--muted)}
 <input id="consulta" type="search" name="s" placeholder="Buscar por palabra, servicio o tema" autocomplete="off" required>
 <button type="submit">Buscar</button>
 </form>
-<p class="result-count" id="status" role="status" aria-live="polite">Ingresá un término de búsqueda.</p>
+<div class="tools"><p class="result-count" id="status" role="status" aria-live="polite">Preparando el índice de contenidos…</p>
+<label for="categoria">Tipo de contenido
+<select id="categoria"><option value="todos">Todos</option><option value="institucional">Servicios e información</option><option value="publicación">Publicaciones</option></select>
+</label></div>
 <ul class="results" id="results"></ul>
+<nav class="pages" id="pages" aria-label="Paginación de resultados" hidden>
+<button id="prev" type="button">← Anterior</button><span id="pageLabel"></span><button id="next" type="button">Siguiente →</button>
+</nav>
 </main>
 <footer><div class="wrap">GMA Consultores · <a href="../index.html">Volver al inicio</a></div></footer>
 <script>
-(async function(){
- const input=document.getElementById('consulta'),list=document.getElementById('results'),status=document.getElementById('status');
- const q=(new URLSearchParams(location.search).get('s')||new URLSearchParams(location.search).get('q')||'').trim();
- input.value=q; if(!q)return;
- const normalized=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
- const terms=normalized(q).split(/\s+/).filter(Boolean);
- status.textContent='Buscando…';
- try {
-  const resp=await fetch('../assets/gma-search-index.json',{cache:'force-cache'});
-  if(!resp.ok)throw Error('No se pudo cargar el índice');
-  const data=await resp.json();
-  const hits=data.filter(item=>terms.every(t=>normalized(item.title+' '+item.url).includes(t)))
-    .sort((a,b)=>(b.type==='institucional')-(a.type==='institucional')).slice(0,100);
-  status.textContent=hits.length?(hits.length+' resultados mostrados para «'+q+'»'):'No encontramos resultados para «'+q+'». Probá otros términos.';
-  for(const item of hits){const li=document.createElement('li'),kind=document.createElement('div'),a=document.createElement('a');
-   kind.className='kind';kind.textContent=item.type;a.href='..'+item.url;a.textContent=item.title;
-   li.append(kind,a);list.append(li);}
- }catch(err){status.textContent='No pudimos completar la búsqueda. Intentá nuevamente.';}
+(() => {
+  'use strict';
+  const input=document.getElementById('consulta');
+  const list=document.getElementById('results');
+  const status=document.getElementById('status');
+  const select=document.getElementById('categoria');
+  const paging=document.getElementById('pages');
+  const pageLabel=document.getElementById('pageLabel');
+  const prev=document.getElementById('prev'),next=document.getElementById('next');
+  const params=new URLSearchParams(location.search);
+  const query=(params.get('s')||params.get('q')||'').trim().slice(0,120);
+  input.value=query;
+  const normalized=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  const words=normalized(query).split(/\s+/).filter(Boolean);
+  let data=[],filtered=[],page=0;
+  const perPage=12;
+  function rank(item) {
+    if(!words.length) return item.type==='institucional'?100:0;
+    const title=normalized(item.title),description=normalized(item.description);
+    const body=normalized(item.body),url=normalized(item.url);
+    if(!words.every(w=>title.includes(w)||description.includes(w)||body.includes(w)||url.includes(w)))return -1;
+    let score=item.type==='institucional'?8:0;
+    for(const w of words){
+      if(title.includes(w))score+=18;
+      if(title.startsWith(w))score+=8;
+      if(description.includes(w))score+=5;
+      if(body.includes(w))score+=2;
+      if(url.includes(w))score+=1;
+    }
+    return score;
+  }
+  function render() {
+    list.replaceChildren();
+    const total=filtered.length;
+    const pages=Math.max(1,Math.ceil(total/perPage));
+    page=Math.max(0,Math.min(page,pages-1));
+    const start=page*perPage;
+    status.textContent=total
+      ? total+' resultados'+(query?' para «'+query+'»':'')+'.'
+      : 'No encontramos resultados. Probá otras palabras o cambiá el filtro.';
+    for(const item of filtered.slice(start,start+perPage)){
+      const li=document.createElement('li');
+      const kind=document.createElement('div');
+      kind.className='kind';kind.textContent=item.type;
+      const link=document.createElement('a');link.href='..'+item.url;link.textContent=item.title;
+      li.append(kind,link);
+      if(item.description){
+        const p=document.createElement('p');p.textContent=item.description;li.append(p);
+      }
+      list.append(li);
+    }
+    paging.hidden=total<=perPage;
+    prev.disabled=page===0;next.disabled=page+1>=pages;
+    pageLabel.textContent='Página '+(page+1)+' de '+pages;
+  }
+  function refresh(){
+    const type=select.value;
+    filtered=data.map(item=>({...item,score:rank(item)}))
+      .filter(item=>item.score>=0&&(type==='todos'||item.type===type))
+      .sort((a,b)=>b.score-a.score||a.title.localeCompare(b.title,'es'));
+    page=0;render();
+  }
+  prev.addEventListener('click',()=>{if(page>0){page--;render();}});
+  next.addEventListener('click',()=>{if((page+1)*perPage<filtered.length){page++;render();}});
+  select.addEventListener('change',refresh);
+  fetch('../assets/gma-search-index.json',{cache:'force-cache'})
+    .then(resp=>{if(!resp.ok)throw Error('No se pudo cargar el índice');return resp.json();})
+    .then(json=>{
+      if(!Array.isArray(json))throw Error('Índice inválido');
+      data=json.filter(item=>item&&typeof item.title==='string'&&typeof item.url==='string'
+        &&/^\/[a-z0-9%_\-./]*\/$/i.test(item.url));
+      refresh();
+    })
+    .catch(()=>{status.textContent='No pudimos cargar los contenidos. Intentá nuevamente más tarde.';});
 })();
 </script>
 </body>
