@@ -17,6 +17,14 @@ async function main(){
    const page=await browser.newPage({viewport:{width,height:900}});
    for(const route of routes){
     await page.goto(BASE+route,{waitUntil:'domcontentloaded',timeout:25000});
+    // "domcontentloaded" can fire before stylesheets load on CI's local
+    // HTTP server; wait for the actual stylesheet to avoid false overflow.
+    await page.waitForFunction(()=>{
+      const links=[...document.querySelectorAll('link[rel="stylesheet"]')];
+      return links.some(link=>link.sheet && (
+        link.href.includes('gma-preview.css') || link.href.includes('gma-search.css')));
+    },null,{timeout:25000});
+
     await page.addScriptTag({path:axeScript});
     const result=await page.evaluate(()=>window.axe.run(document,{
       runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa']}
