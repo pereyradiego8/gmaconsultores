@@ -80,11 +80,11 @@ def transform(markup:str,file:Path)->tuple[str,dict]:
             inject.append('<meta name="description" content="'+html.escape(desc,quote=True)+'">')
             info["description"]=True
     alias=(relative.startswith("index.html@") or relative.startswith("author/admin/"))
-    if alias and not re.search(r'<meta\b[^>]*name=["\']robots["\']',markup,re.I):
+    if alias and not re.search(r'<meta\b[^>]*name=["\']robots["\'][^>]*noindex',markup,re.I):
         inject.append('<meta name="robots" content="noindex,follow">')
         info["alias_noindex"]=True
     # Do not fabricate an authoritative canonical if the export already declares one.
-    if not alias and not re.search(r'<link\b[^>]*rel=["\']canonical["\']',markup,re.I):
+    if not alias and not re.search(r'<meta\b[^>]*name=["\']robots["\'][^>]*noindex',markup,re.I) and not re.search(r'<link\b[^>]*rel=["\']canonical["\']',markup,re.I):
         inject.append('<link rel="canonical" href="'+CANONICAL+html.escape(url_for(file),quote=True)+'">')
     if inject:
         markup=HEAD_END.sub("\n"+"\n".join(inject)+"\n</head>",markup,count=1)
@@ -99,7 +99,7 @@ def main()->None:
     parser.add_argument("--output",default="dist",help="new directory inside repository; never deploys")
     args=parser.parse_args()
     output=ROOT/args.output
-    if not args.output or Path(args.output).is_absolute() or len(Path(args.output).parts)!=1 or args.output in OMIT or args.output.startswith("."):
+    if not args.output or Path(args.output).is_absolute() or len(Path(args.output).parts)!=1 or args.output in (OMIT-{"dist"}) or args.output.startswith("."):
         parser.error("output must be a new top-level directory such as dist")
     if output.exists():
         shutil.rmtree(output)
