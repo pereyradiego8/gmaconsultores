@@ -1,0 +1,59 @@
+name: Verificación estática GMA
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - name: Verificar rutas institucionales e índices
+        run: python3 scripts/audit_static.py
+      - name: Inspeccionar todos los HTML y recursos
+        run: python3 scripts/inspect_archive.py --output reports/gma-static-audit.json
+      - name: Generar versión de prueba sin desplegar
+        run: python3 scripts/build_static.py --output dist
+      - name: Validar la versión generada
+        run: python3 scripts/audit_static.py --root dist
+      - name: Pruebas de regresión de formularios, recursos y rutas
+        run: python3 scripts/verify_build.py
+      - name: Auditar enlaces locales del build
+        run: python3 scripts/check_links.py --root dist --output reports/gma-links.json
+      - name: Exigir que la propuesta no tenga recursos locales rotos
+        run: python3 scripts/check_links.py --root dist --focus propuesta/ --strict --output reports/gma-preview-links.json
+      - name: Construir vista previa aislada sin desplegar
+        run: python3 scripts/build_preview.py --output preview-dist
+      - name: Verificar integración del contenido y las imágenes originales
+        run: python3 scripts/verify_integrated.py
+      - name: Validar recursos y navegación del preview Cloudflare
+        run: python3 scripts/check_links.py --root preview-dist --focus propuesta/ --strict --output reports/gma-cloudflare-preview-links.json
+      - name: Validar metadatos antiindexación
+        run: |
+          grep -q "Disallow: /" preview-dist/robots.txt
+          grep -q "X-Robots-Tag: noindex" preview-dist/_headers
+          test -f preview-dist/propuesta/contacto/index.html
+          test -f preview-dist/buscar/index.html
+      - name: Verificar responsive real con Chrome (320px–1440px)
+        run: |
+          npm install --prefix /tmp/gma-responsive-qa --no-audit --no-fund playwright-core@1.57.0 axe-core@4.10.3
+          python3 -m http.server 8765 --directory preview-dist --bind 127.0.0.1 >/tmp/gma-local-http.log 2>&1 &
+          NODE_PATH=/tmp/gma-responsive-qa/node_modules node scripts/check_responsive.cjs
+      - name: Verificar accesibilidad WCAG 2.1 AA en móvil y escritorio
+        run: NODE_PATH=/tmp/gma-responsive-qa/node_modules node scripts/check_accessibility.cjs
+      - name: Adjuntar informes y el índice del buscador
+        uses: actions/upload-artifact@v6
+        with:
+          name: auditoria-estatica-gma
+          path: |
+            reports/gma-static-audit.json
+            reports/gma-build.json
+            reports/gma-links.json
+            reports/gma-preview-links.json
+            reports/gma-cloudflare-preview-links.json
+            dist/assets/gma-search-index.json
+            reports/responsive/
+            reports/accessibility/

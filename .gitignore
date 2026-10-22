@@ -1,0 +1,6 @@
+# Solo archivos fuente y auditables
+/dist/
+/reports/
+/__pycache__/
+*.pyc
+.DS_Store
