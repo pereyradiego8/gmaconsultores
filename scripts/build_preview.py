@@ -24,7 +24,7 @@ ROOT=Path(__file__).resolve().parents[1]
 ORIGINAL="https://gmaconsultores.com.ar"
 PREVIEW_PAGES=("index.html","nosotros/index.html","servicios/index.html",
                "novedades/index.html","oportunidades/index.html","contacto/index.html")
-ASSETS=("assets/gma-preview.css","assets/gma-content.css","wp-content/uploads/2020/07/GMA.-Web.-Favicon.png",
+ASSETS=("assets/gma-preview.css","assets/gma-content.css","assets/gma-forms.css","assets/gma-forms.js","wp-content/uploads/2020/07/GMA.-Web.-Favicon.png",
        "wp-content/uploads/2020/08/GMA.-Web.-Logo2.png",
        "wp-content/uploads/2020/09/GMA.-Slider.-Asesoramiento.jpg")
 
@@ -89,28 +89,103 @@ def recent_public_news():
         print("Aviso: no se pudo consultar noticias públicas de WordPress:",type(exc).__name__)
         return []
 
-def recent_jobs_section(dest: Path) -> str:
-    """Show six archived job listings within the renovated careers section.
+def get_public_jobs() -> tuple[list[dict], bool]:
+    """Use the real public WordPress careers category as source of truth.
 
-    This is an archive, never an assertion that hiring is currently open.
+    Fallback is explicitly archival (never claim unverifiable vacancies
+    are active). The public posts are dated; publication != current vacancy.
     """
-    source=ROOT/"oportunidades/index.html"
-    text=source.read_text(encoding="utf-8",errors="replace")
-    main=MAIN.search(text)
-    if not main:
-        return ""
-    articles=ARTICLE.findall(main.group(0))[:6]
-    valid={"/"+p.relative_to(dest).as_posix().removesuffix("index.html")
-           for p in dest.rglob("index.html")}
-    cards=listing_from_articles("".join(articles),"/oportunidades/",valid,set())
-    if not cards:
-        return ""
-    return ('<section class="section"><div class="container">'
-            '<div class="section-head"><div><p class="kicker">Archivo laboral</p>'
-            '<h2>Búsquedas profesionales publicadas</h2></div>'
-            '<p class="section-intro">Estos avisos provienen del archivo institucional; '
-            'su vigencia debe consultarse en cada publicación.</p></div>'
-            + cards + '</div></section>')
+    valid=[]
+    try:
+        def public_json(url: str):
+            req=urllib.request.Request(url,headers={
+                "Accept":"application/json",
+                "User-Agent":"GMA-Preview-Build/1.0 (+https://gmaconsultores-preview.pages.dev)"})
+            with urllib.request.urlopen(req,timeout=9) as resp:
+                if resp.status!=200:
+                    raise ValueError("API HTTP "+str(resp.status))
+                return json.loads(resp.read(400000).decode("utf-8"))
+        cats=public_json(ORIGINAL+"/wp-json/wp/v2/categories?slug=busqueda")
+        cid=next(int(row["id"]) for row in cats if row.get("slug")=="busqueda")
+        posts=public_json(ORIGINAL+(
+            "/wp-json/wp/v2/posts?categories="+str(cid)+
+            "&per_page=30&_fields=id,date,modified,link,title,excerpt"))
+        for row in posts:
+            raw=row.get("title",{}).get("rendered","")
+            title=html.unescape(html.unescape(re.sub(r"<[^>]*>"," ",raw)))
+            title=" ".join(title.split())[:140]
+            link=row.get("link","")
+            date=row.get("date","")[:10]
+            slug=urlsplit(link).path
+            if not title or not re.fullmatch(r"\d{4}-\d{2}-\d{2}",date):
+                continue
+            if not slug.startswith("/") or urlsplit(link).hostname!="gmaconsultores.com.ar":
+                continue
+            excerpt=html.unescape(html.unescape(
+                re.sub(r"<[^>]*>"," ",row.get("excerpt",{}).get("rendered",""))))
+            excerpt=" ".join(excerpt.split())[:170].rstrip(" .")
+            valid.append({"title":title,"url":link,"date":date,"excerpt":excerpt})
+        print("Avisos de empleo obtenidos directamente de WordPress:",len(valid))
+        return valid, True
+    except (OSError,ValueError,KeyError,StopIteration,TypeError,UnicodeError) as exc:
+        print("Aviso: API pública de vacantes no disponible:",type(exc).__name__)
+        return [], False
+
+
+def careers_section(jobs: list[dict], fetched: bool, dest: Path) -> tuple[str, str]:
+    """Render traceable job cards and a safe role list for the email form."""
+    if not fetched:
+        # Historic listings remain visible, explicitly NOT called active.
+        source=ROOT/"oportunidades/index.html"
+        markup=source.read_text(encoding="utf-8",errors="replace")
+        match=MAIN.search(markup)
+        articles=ARTICLE.findall(match.group(0))[:8] if match else []
+        valid={"/"+f.relative_to(dest).as_posix().removesuffix("index.html")
+               for f in dest.rglob("index.html")}
+        cards=listing_from_articles("".join(articles),"/oportunidades/",valid,set())
+        options='<option value="Base de talentos">Base de talentos / presentación espontánea</option>'
+        return (
+            '<section class="section"><div class="container"><div class="section-head">'
+            '<div><p class="kicker">Archivo institucional</p>'
+            '<h2>Publicaciones laborales anteriores</h2></div>'
+            '<p class="section-intro">No fue posible confirmar los avisos mediante la API oficial durante esta compilación. '
+            'Consultá las búsquedas oficiales antes de postularte.</p></div>'
+            +cards+'</div></section>',options)
+    if not jobs:
+        return ('<section class="section"><div class="container">'
+                '<h2>No hay avisos publicados en la categoría Búsqueda.</h2>'
+                '<p>Podés enviar una presentación espontánea a Recursos Humanos.</p>'
+                '</div></section>','<option value="Base de talentos">Base de talentos / presentación espontánea</option>')
+    from datetime import datetime,timezone
+    updated=datetime.now(timezone.utc).strftime("%d/%m/%Y")
+    cards=[]
+    options=[]
+    for job in jobs:
+        title,raw,date=job["title"],job["url"],job["date"]
+        path=urlsplit(raw).path
+        href=path if (dest/path.lstrip("/")/"index.html").is_file() else raw
+        heading=html.escape(title)
+        from urllib.parse import quote
+        apply="/propuesta/oportunidades/?puesto="+quote(title,safe="")+"#postulacion"
+        date_display=date[8:10]+"/"+date[5:7]+"/"+date[:4]
+        summary=html.escape(job["excerpt"][:165]) if job["excerpt"] else "Ver los requisitos y condiciones completos en el aviso."
+        cards.append('<article class="gma-job">'
+           '<p class="kicker">Publicación del '+date_display+'</p>'
+           '<h3>'+heading+'</h3><p>'+summary+'</p>'
+           '<div class="actions"><a class="button secondary" href="'+html.escape(href,quote=True)+'">Ver aviso completo →</a>'
+           '<a class="button primary" href="'+html.escape(apply,quote=True)+'">Postularme ↗</a>'
+           '</div></article>')
+        options.append('<option value="'+html.escape(title,quote=True)+'">'+heading+'</option>')
+    cards_html='<section class="section"><div class="container">'
+    cards_html+='<div class="section-head"><div><p class="kicker">Empleo · fuente oficial</p>'
+    cards_html+='<h2>Búsquedas publicadas por GMA</h2></div>'
+    cards_html+='<p class="section-intro">GMA las muestra bajo «Búsquedas activas». '
+    cards_html+='Algunas tienen publicaciones antiguas: confirmá su vigencia con RR. HH. '
+    cards_html+='Datos consultados el '+updated+'.</p></div>'
+    cards_html+='<div class="gma-jobs">'+''.join(cards)+'</div></div></section>'
+    return cards_html,"".join(options)+(
+        '<option value="Base de talentos">Base de talentos / presentación espontánea</option>')
+
 
 
 def news_section(items, dest: Path):
@@ -150,6 +225,8 @@ def main():
         target=dest/asset
         target.parent.mkdir(parents=True,exist_ok=True)
         shutil.copy2(infile,target)
+    jobs,fetched=get_public_jobs()
+    jobs_markup,job_options=careers_section(jobs,fetched,dest)
     for page in PREVIEW_PAGES:
         infile=ROOT/"propuesta"/page
         if not infile.is_file(): raise RuntimeError("Missing preview page: "+page)
@@ -161,9 +238,20 @@ def main():
             if extra:
                 page_src=page_src.replace("</main>",extra+"</main>")
         if page=="oportunidades/index.html":
-            extra=recent_jobs_section(dest)
-            if extra:
-                page_src=page_src.replace("</main>",extra+"</main>")
+            page_src=page_src.replace("<!--GMA_JOB_OPTIONS-->",job_options)
+            page_src=page_src.replace('<section class="section gma-form-wrap" id="postulacion">',jobs_markup+'<section class="section gma-form-wrap" id="postulacion">')
+        if page=="index.html" and fetched and jobs:
+            from urllib.parse import quote
+            top=''.join(
+                '<article class="simple-item"><p class="kicker">Empleo</p><h3>'+
+                html.escape(row["title"])+'</h3><a class="button secondary" href="'+
+                html.escape(urlsplit(row["url"]).path,quote=True)+'">Ver aviso →</a></article>'
+                for row in jobs[:3])
+            home='<section class="section"><div class="container"><div class="section-head">'
+            home+='<div><p class="kicker">Empleos publicados</p><h2>Oportunidades en GMA</h2></div>'
+            home+='<a class="button secondary" href="/propuesta/oportunidades/">Ver todas las búsquedas →</a>'
+            home+='</div><div class="simple-list">'+top+'</div></div></section>'
+            page_src=page_src.replace("</main>",home+"</main>")
         if page=="servicios/index.html":
             page_src=page_src.replace("Ver contenido original ↗","Ver servicio completo →")
         if page=="nosotros/index.html":
