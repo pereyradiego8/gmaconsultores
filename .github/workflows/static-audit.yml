@@ -21,6 +21,8 @@ jobs:
         run: python3 scripts/audit_static.py --root dist
       - name: Auditar enlaces locales del build
         run: python3 scripts/check_links.py --root dist --output reports/gma-links.json
+      - name: Exigir que la propuesta no tenga recursos locales rotos
+        run: python3 scripts/check_links.py --root dist --focus propuesta/ --strict --output reports/gma-preview-links.json
       - name: Adjuntar informes y el índice del buscador
         uses: actions/upload-artifact@v6
         with:
@@ -29,4 +31,5 @@ jobs:
             reports/gma-static-audit.json
             reports/gma-build.json
             reports/gma-links.json
+            reports/gma-preview-links.json
             dist/assets/gma-search-index.json
