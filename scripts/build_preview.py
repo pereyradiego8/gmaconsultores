@@ -16,8 +16,9 @@ import shutil
 import urllib.request
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import urlsplit
 from build_static import title_from, description_from, plain
-from import_original import import_archive
+from import_original import import_archive, listing_from_articles, MAIN, ARTICLE
 
 ROOT=Path(__file__).resolve().parents[1]
 ORIGINAL="https://gmaconsultores.com.ar"
@@ -88,14 +89,40 @@ def recent_public_news():
         print("Aviso: no se pudo consultar noticias públicas de WordPress:",type(exc).__name__)
         return []
 
-def news_section(items):
+def recent_jobs_section(dest: Path) -> str:
+    """Show six archived job listings within the renovated careers section.
+
+    This is an archive, never an assertion that hiring is currently open.
+    """
+    source=ROOT/"oportunidades/index.html"
+    text=source.read_text(encoding="utf-8",errors="replace")
+    main=MAIN.search(text)
+    if not main:
+        return ""
+    articles=ARTICLE.findall(main.group(0))[:6]
+    valid={"/"+p.relative_to(dest).as_posix().removesuffix("index.html")
+           for p in dest.rglob("index.html")}
+    cards=listing_from_articles("".join(articles),"/oportunidades/",valid,set())
+    if not cards:
+        return ""
+    return ('<section class="section"><div class="container">'
+            '<div class="section-head"><div><p class="kicker">Archivo laboral</p>'
+            '<h2>Búsquedas profesionales publicadas</h2></div>'
+            '<p class="section-intro">Estos avisos provienen del archivo institucional; '
+            'su vigencia debe consultarse en cada publicación.</p></div>'
+            + cards + '</div></section>')
+
+
+def news_section(items, dest: Path):
     if not items:
         return ""
     cards=[]
     for title,url,date in items:
+        path=urlsplit(url).path
+        href=path if (dest/path.lstrip("/")/"index.html").is_file() else url
         cards.append('<article class="simple-item"><p class="kicker">Publicación · '+
                      html.escape(date)+'</p><h3>'+html.escape(title)+'</h3>'+
-                     '<a class="button secondary" href="'+html.escape(url,quote=True)+
+                     '<a class="button secondary" href="'+html.escape(href,quote=True)+
                      '">Leer en la web oficial ↗</a></article>')
     return '<section class="section"><div class="container">'+\
            '<div class="section-head"><div><p class="kicker">Actualizaciones del sitio original</p>'+\
@@ -130,9 +157,21 @@ def main():
         target.parent.mkdir(parents=True,exist_ok=True)
         page_src=internal_to_live(page,infile.read_text(encoding="utf-8"))
         if page=="novedades/index.html":
-            extra=news_section(recent_public_news())
+            extra=news_section(recent_public_news(),dest)
             if extra:
                 page_src=page_src.replace("</main>",extra+"</main>")
+        if page=="oportunidades/index.html":
+            extra=recent_jobs_section(dest)
+            if extra:
+                page_src=page_src.replace("</main>",extra+"</main>")
+        if page=="servicios/index.html":
+            page_src=page_src.replace("Ver contenido original ↗","Ver servicio completo →")
+        if page=="nosotros/index.html":
+            page_src=page_src.replace("Ver la página institucional original ↗","Conocer nuestra trayectoria →")
+        if page=="novedades/index.html":
+            page_src=page_src.replace("Explorar las novedades originales →","Ver archivo completo →")
+        if page=="oportunidades/index.html":
+            page_src=page_src.replace("Consultar oportunidades originales →","Ver archivo completo →")
         target.write_text(page_src,encoding="utf-8")
     search=ROOT/"buscar/index.html"
     target=dest/"buscar/index.html"
