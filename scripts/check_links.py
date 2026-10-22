@@ -44,7 +44,7 @@ def main():
    if not target:continue
    if target.startswith("/"):file=root/target.lstrip("/")
    else:file=page.parent/target
-   if not file.exists() and (target.endswith("/") or not Path(target).suffix):
+   if file.is_dir() or (not file.exists() and (target.endswith("/") or not Path(target).suffix)):
     file=file/"index.html"
    counts[kind.lower()+"_checked"]+=1
    if not file.is_file():
